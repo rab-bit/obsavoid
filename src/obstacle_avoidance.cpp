@@ -4,6 +4,7 @@
 #include <sensor_msgs/LaserScan.h>
 
 #include <sstream>
+#include <math.h>
 
 //Define publisher e subscriber
 ros::Subscriber sub;
@@ -48,13 +49,32 @@ void laserCallback(sensor_msgs::LaserScan scan)
 {
     
     //Calcula Numero de Amostras
-    int numero_amostras = (int) (scan.angle_max - scan.angle_min) / scan.angle_increment;
+    int numero_amostras = (int) floor((scan.angle_max - scan.angle_min) / scan.angle_increment);
     
     //Imprime informacoes do laser
-      ROS_INFO("I heard:");
-      ROS_INFO("MIN: [%lf]", scan.ranges[0]);
-      ROS_INFO("MED: [%lf]", scan.ranges[numero_amostras/2]);
-      ROS_INFO("MAX: [%lf]", scan.ranges[numero_amostras]);
+    int amostra = 0;
+    ROS_INFO("I heard:");
+    ROS_INFO("MIN[%d]: [%lf]", amostra, scan.ranges[amostra]);
+    
+    amostra = (int)floor(numero_amostras/4);
+    ROS_INFO("---[%d]: [%lf]", amostra,  scan.ranges[amostra]);
+    
+    amostra = (int)floor(numero_amostras/3);
+    ROS_INFO("---[%d]: [%lf]", amostra,  scan.ranges[amostra]);
+    
+    amostra = (int)floor(numero_amostras/2);
+    ROS_INFO("MED[%d]: [%lf]", amostra,  scan.ranges[amostra]);
+    
+    amostra = (int)floor(2 * numero_amostras/3);
+    ROS_INFO("+++[%d]: [%lf]", amostra,  scan.ranges[amostra]);
+    
+    amostra = (int)floor(5 * numero_amostras/6);
+    ROS_INFO("+++[%d]: [%lf]", amostra,  scan.ranges[amostra]);
+    
+    amostra = numero_amostras;
+    ROS_INFO("MAX[%d]: [%lf]", amostra,  scan.ranges[amostra]);
+    
+    
 }
 
 /*********************************************************************************
