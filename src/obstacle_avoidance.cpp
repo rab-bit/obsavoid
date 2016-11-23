@@ -56,10 +56,10 @@ void laserCallback(sensor_msgs::LaserScan scan)
     ROS_INFO("I heard:");
     ROS_INFO("MIN[%d]: [%lf]", amostra, scan.ranges[amostra]);
     
-    amostra = (int)floor(numero_amostras/4);
+    amostra = (int)floor(numero_amostras/8);
     ROS_INFO("---[%d]: [%lf]", amostra,  scan.ranges[amostra]);
     
-    amostra = (int)floor(numero_amostras/3);
+    amostra = (int)floor(numero_amostras/4);
     ROS_INFO("---[%d]: [%lf]", amostra,  scan.ranges[amostra]);
     
     amostra = (int)floor(numero_amostras/2);
