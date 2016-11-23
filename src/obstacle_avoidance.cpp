@@ -36,11 +36,11 @@ void obstacleAvoidanceControl(geometry_msgs::Twist twist_teleop){
             twist_teleop.linear.x *=
             fmin(1, exp(scan_mem.ranges[(int)floor(numero_amostras/2)] - 0.5) - 1);
         
-        if(scan_mem.ranges[(int)floor(numero_amostras/3)] < .20) // -0.785 rad a uma distancia de 20cm
+        if(scan_mem.ranges[(int)floor(numero_amostras/3)] < .36) // -0.785 rad a uma distancia de 20cm
             twist_teleop.linear.x *=
             fmin(1, exp(scan_mem.ranges[(int)floor(numero_amostras/3)] - 0.10) - 1);
         
-        if(scan_mem.ranges[(int)floor(2*numero_amostras/3)] < .20) // +0.785 rad a uma distancia de 20cm
+        if(scan_mem.ranges[(int)floor(2*numero_amostras/3)] < .36) // +0.785 rad a uma distancia de 20cm
             twist_teleop.linear.x *=
             fmin(1, exp(scan_mem.ranges[(int)floor(2*numero_amostras/3)] - 0.10) - 1);
         
