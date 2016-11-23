@@ -113,6 +113,7 @@ int main(int argc, char **argv)
 
   //Inicializa o noh
   ros::init(argc, argv, "obstacle_avoidance");
+    scan_mem = new
 
   /**
    * NodeHandle is the main access point to communications with the ROS system.
@@ -124,12 +125,13 @@ int main(int argc, char **argv)
 
   //Define as publicacoes de twist para o cmd_vel do robo
   pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 1);
-
-  //Define a escuta do topico com as velocidades fornecidas pelo turtlebot
-  sub = n.subscribe("/cmd_vel_mux/input/teleop", 100, teleopCallback);
+    
     
   //Define a escuta do topico com as medicoes do laser
   sub_laser = n.subscribe("/hokuyo_scan", 100, laserCallback);
+
+  //Define a escuta do topico com as velocidades fornecidas pelo turtlebot
+  sub = n.subscribe("/cmd_vel_mux/input/teleop", 100, teleopCallback);
 
   /**
    * ros::spin() will enter a loop, pumping callbacks.  With this version, all
