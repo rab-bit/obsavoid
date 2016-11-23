@@ -6,15 +6,20 @@
 #include <sstream>
 #include <math.h>
 
-//Define publisher e subscriber
+
+//VARIAVEIS GLOBAIS---------------------------------------------------------------
+
+//Define publishers e subscribers
 ros::Subscriber sub;
 ros::Subscriber sub_laser;
 ros::Publisher pub;
 
-//Define amostras memoria de dados para LaserScan
+//Variavel que armazena a ultima leitura do laser
 sensor_msgs::LaserScan scan_mem;
 
+//Variavel que funciona como um semaforo que indica se scan_mem foi inicializada
 int scan_mem_active = 0;
+
 
 //METODOS-------------------------------------------------------------------------
 
