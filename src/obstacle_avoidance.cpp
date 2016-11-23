@@ -23,7 +23,7 @@ sensor_msgs::LaserScan scan_mem;
 **/
 void obstacleAvoidanceControl(geometry_msgs::Twist* twist_teleop){
     
-    int numero_amostras = (int) floor((scan_mem.angle_max - scan.angle_min) / scan_mem.angle_increment);
+    int numero_amostras = (int) floor((scan_mem.angle_max - scan_mem.angle_min) / scan_mem.angle_increment);
     
     int amostra = (int)floor(numero_amostras/2); // Leitura de 0 rad
     float dist_obstaculo = scan_mem.ranges[amostra];
