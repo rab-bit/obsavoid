@@ -1,0 +1,71 @@
+#include "ros/ros.h"
+#include "std_msgs/String.h"
+#include <geometry_msgs/Twist.h>
+
+#include <sstream>
+
+//Define publisher e subscriber
+ros::Subscriber sub;
+ros::Publisher pub;
+
+
+//METODOS-------------------------------------------------------------------------
+
+/*********************************************************************************
+ * Recebe informacoes dos sensores e de direcao. Publica comandos de velocidade 
+ * evitando bater em obstaculos.
+**/
+void obstacleAvoidanceControl(){
+
+}
+
+/*********************************************************************************
+ * Callback da escuta de informacoes de velocidade
+**/
+void teleopCallback(geometry_msgs::Twist twist_teleop)
+{
+  //Imprime informacoes de twist
+  ROS_INFO("I heard:");
+  ROS_INFO("Lin X: [%f]", twist_teleop.linear.x);
+  ROS_INFO("Lin Y: [%f]", twist_teleop.linear.y);
+  ROS_INFO("Ang Z: [%f]", twist_teleop.angular.z);
+
+  //Altera o twist devido a obstaculos TODO
+  obstacleAvoidanceControl();
+
+  //Publica twist para o cmd_vel robo
+  pub.publish(twist_teleop);
+  
+}
+
+/*********************************************************************************
+**/
+int main(int argc, char **argv)
+{
+
+  //Inicializa o noh
+  ros::init(argc, argv, "obstacle_avoidance");
+
+  /**
+   * NodeHandle is the main access point to communications with the ROS system.
+   * The first NodeHandle constructed will fully initialize this node, and the last
+   * NodeHandle destructed will close down the node.
+   */
+  ros::NodeHandle n;
+
+
+  //Define as publicacoes de twist para o cmd_vel do robo
+  pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 1);
+
+  //Define a escuta do topico com as velocidades fornecidas pelo turtlebot
+  sub = n.subscribe("/cmd_vel_mux/input/teleop", 1000, teleopCallback);
+
+  /**
+   * ros::spin() will enter a loop, pumping callbacks.  With this version, all
+   * callbacks will be called from within this thread (the main one).  ros::spin()
+   * will exit when Ctrl-C is pressed, or the node is shutdown by the master.
+   */
+  ros::spin();
+
+  return 0;
+}
