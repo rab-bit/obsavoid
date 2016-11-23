@@ -1,11 +1,13 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 #include <geometry_msgs/Twist.h>
+#include <sensor_msgs/LaserScan.h>
 
 #include <sstream>
 
 //Define publisher e subscriber
 ros::Subscriber sub;
+ros::Subscriber sub_laser;
 ros::Publisher pub;
 
 
@@ -25,10 +27,11 @@ void obstacleAvoidanceControl(){
 void teleopCallback(geometry_msgs::Twist twist_teleop)
 {
   //Imprime informacoes de twist
-  ROS_INFO("I heard:");
-  ROS_INFO("Lin X: [%f]", twist_teleop.linear.x);
-  ROS_INFO("Lin Y: [%f]", twist_teleop.linear.y);
-  ROS_INFO("Ang Z: [%f]", twist_teleop.angular.z);
+//  ROS_INFO("I heard:");
+//  ROS_INFO("Lin X: [%f]", twist_teleop.linear.x);
+//  ROS_INFO("Lin Y: [%f]", twist_teleop.linear.y);
+//  ROS_INFO("Ang Z: [%f]", twist_teleop.angular.z);
+    
 
   //Altera o twist devido a obstaculos TODO
   obstacleAvoidanceControl();
@@ -36,6 +39,22 @@ void teleopCallback(geometry_msgs::Twist twist_teleop)
   //Publica twist para o cmd_vel robo
   pub.publish(twist_teleop);
   
+}
+
+/*********************************************************************************
+ * Callback da escuta de informacoes do laser
+ **/
+void laserCallback(sensor_msgs::LaserScan scan)
+{
+    
+    //Calcula Numero de Amostras
+    int numero_amostras = (int) (scan.angle_max - scan.angle_min) / scan.angle_increment;
+    
+    //Imprime informacoes do laser
+      ROS_INFO("I heard:");
+      ROS_INFO("MIN: [%lf]", scan.ranges[0]);
+      ROS_INFO("MED: [%lf]", scan.ranges[numero_amostras/2]);
+      ROS_INFO("MAX: [%lf]", scan.ranges[numero_amostras]);
 }
 
 /*********************************************************************************
@@ -59,6 +78,9 @@ int main(int argc, char **argv)
 
   //Define a escuta do topico com as velocidades fornecidas pelo turtlebot
   sub = n.subscribe("/cmd_vel_mux/input/teleop", 100, teleopCallback);
+    
+  //Define a escuta do topico com as medicoes do laser
+  sub_laser = n.subscribe("/hokuyo_scan", 100, laserCallback);
 
   /**
    * ros::spin() will enter a loop, pumping callbacks.  With this version, all
