@@ -42,7 +42,7 @@ void obstacleAvoidanceControl(geometry_msgs::Twist twist_teleop){
 					scan_mem.ranges[(int)floor(numero_amostras/3)] // -0.785 rad
 				), 
 			   	scan_mem.ranges[(int)floor(2*numero_amostras/3)] // e +0.785 rad
-			     ) - .5 //Distancia maxima entre o robo e a parede (velocidade = 0)
+			     ) - .2 //Distancia maxima entre o robo e a parede (velocidade = 0)
 			) - 1 //Desloca a funcao exponencial para o valor 0 do eixo y
 		); //Reduz a velocidade exponencialmente
 
