@@ -21,7 +21,7 @@ sensor_msgs::LaserScan scan_mem;
  * Recebe informacoes dos sensores e de direcao. Publica comandos de velocidade 
  * evitando bater em obstaculos.
 **/
-void obstacleAvoidanceControl(geometry_msgs::Twist* twist_teleop){
+void obstacleAvoidanceControl(geometry_msgs::Twist twist_teleop){
     
     int numero_amostras = (int) floor((scan_mem.angle_max - scan_mem.angle_min) / scan_mem.angle_increment);
     
@@ -29,20 +29,23 @@ void obstacleAvoidanceControl(geometry_msgs::Twist* twist_teleop){
     float dist_obstaculo = scan_mem.ranges[amostra];
     
     //Se estiver andando no sentido positivo de x e houver obstaculo a menos de 1 metro
-    if (twist_teleop->linear.x > 0 && dist_obstaculo < 1)
-        twist_teleop->linear.x *= (exp(dist_obstaculo) - 1); //Reduz a velocidade exponencialmente
+    if (twist_teleop.linear.x > 0 && dist_obstaculo < 1)
+        twist_teleop.linear.x *= (exp(dist_obstaculo) - 1); //Reduz a velocidade exponencialmente
     
     //Se estiver andando no sentido negativo de x e houver obstaculos a menos de 1 metro
     else if (
-             twist_teleop->linear.x < 0 &&
+             twist_teleop.linear.x < 0 &&
              (scan_mem.ranges[numero_amostras] < 1 // +2.355 rad
               || scan_mem.ranges[0] < 1) // -2.355 rad
              )
-        twist_teleop->linear.x *=
+        twist_teleop.linear.x *=
         (exp(fmin(scan_mem.ranges[numero_amostras], scan_mem.ranges[0])) - 1);
     
 //    //Limita a velocidade angular
-//    twist_teleop->angular.z = twist_teleop->linear.x;
+//    twist_teleop.angular.z = twist_teleop.linear.x;
+    
+    //Publica twist para o cmd_vel robo
+    pub.publish(twist_teleop);
 
 }
 
@@ -59,10 +62,8 @@ void teleopCallback(geometry_msgs::Twist twist_teleop)
     
 
   //Altera o twist devido a obstaculos TODO
-  obstacleAvoidanceControl(&twist_teleop);
-
-  //Publica twist para o cmd_vel robo
-  pub.publish(twist_teleop);
+  obstacleAvoidanceControl(twist_teleop);
+  
   
 }
 
