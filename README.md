@@ -8,3 +8,6 @@ Package demo for ROS navigation in Gazebo usingo Pioneer 3AT.
 Movimentacao do Pioneer 3AT com obstacle avoidance.
 
 modulo do trabalho em src/obstacle_avoidance.cpp
+
+ 
+
