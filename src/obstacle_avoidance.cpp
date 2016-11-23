@@ -11,6 +11,9 @@ ros::Subscriber sub;
 ros::Subscriber sub_laser;
 ros::Publisher pub;
 
+//Define amostras memoria de dados para LaserScan
+sensor_msgs::LaserScan scan_mem;
+
 
 //METODOS-------------------------------------------------------------------------
 
@@ -18,7 +21,29 @@ ros::Publisher pub;
  * Recebe informacoes dos sensores e de direcao. Publica comandos de velocidade 
  * evitando bater em obstaculos.
 **/
-void obstacleAvoidanceControl(){
+void obstacleAvoidanceControl(geometry_msgs::Twist* twist_teleop){
+    
+    int numero_amostras = (int) floor((scan.angle_max - scan.angle_min) / scan.angle_increment);
+    
+    
+    int amostra = (int)floor(numero_amostras/2); // Leitura de 0 rad
+    float dist_obstaculo = scan_mem.ranges[amostra];
+    
+    //Se estiver andando no sentido positivo de x e houver obstaculo a menos de 1 metro
+    if (twist_teleop->linear.x > 0 && dist_obstaculo < 1)
+        twist_teleop->linear.x *= (exp(dist_obstaculo) - 1); //Reduz a velocidade exponencialmente
+    
+    //Se estiver andando no sentido negativo de x e houver obstaculos a menos de 1 metro
+    else if (
+             twist_teleop->linear.x < 0 &&
+             (scan_mem.ranges[numero_amostras] < 1 // +2.355 rad
+              || scan_mem.ranges[0] < 1) // -2.355 rad
+             )
+        twist_teleop->linear.x *=
+        (exp(fmin(scan_mem.ranges[numero_amostras], scan_mem.ranges[0])) - 1);  
+    
+//    //Limita a velocidade angular
+//    twist_teleop->angular.z = twist_teleop->linear.x;
 
 }
 
@@ -35,7 +60,7 @@ void teleopCallback(geometry_msgs::Twist twist_teleop)
     
 
   //Altera o twist devido a obstaculos TODO
-  obstacleAvoidanceControl();
+  obstacleAvoidanceControl(&twist_teleop);
 
   //Publica twist para o cmd_vel robo
   pub.publish(twist_teleop);
@@ -76,6 +101,8 @@ void laserCallback(sensor_msgs::LaserScan scan)
     amostra = numero_amostras;
     ROS_INFO("MAX[%d]: [%lf]", amostra,  scan.ranges[amostra]); // +2.355 rad
     
+    //Armazena a leitura atual
+    scan_mem = scan;
     
 }
 
