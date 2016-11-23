@@ -28,23 +28,23 @@ void obstacleAvoidanceControl(geometry_msgs::Twist twist_teleop){
     
     int numero_amostras = (int) floor((scan_mem.angle_max - scan_mem.angle_min) / scan_mem.angle_increment);
     
-    //Se estiver andando no sentido positivo de x e houver obstaculo frontal
-    if (twist_teleop.linear.x > 0 && 
-	(scan_mem.ranges[(int)floor(numero_amostras/2)] < 1 // 0 rad
-	|| scan_mem.ranges[(int)floor(numero_amostras/3)] < .15 // -0.785 rad
-	|| scan_mem.ranges[(int)floor(2*numero_amostras/3)] < .15) // +0.785 rad
-	)
-        twist_teleop.linear.x *= 
-		fmin(1 , //Maximo de 1 e
-			exp( //O exponencial de euler
-		    	    fmin( //Minimo entre
-			   	fmin(scan_mem.ranges[(int)floor(numero_amostras/2)], // 0 rad,
-					scan_mem.ranges[(int)floor(numero_amostras/3)] // -0.785 rad
-				), 
-			   	scan_mem.ranges[(int)floor(2*numero_amostras/3)] // e +0.785 rad
-			     ) - .2 //Distancia maxima entre o robo e a parede (velocidade = 0)
-			) - 1 //Desloca a funcao exponencial para o valor 0 do eixo y
-		); //Reduz a velocidade exponencialmente
+    //Se estiver andando no sentido positivo de x e houver obstaculo frontal,
+    // reduz a velocidade exponencialmente
+    if (twist_teleop.linear.x > 0){
+        
+        if(scan_mem.ranges[(int)floor(numero_amostras/2)] < 1) // 0 rad a uma distancia de 1m
+            twist_teleop.linear.x *=
+            fmin(1, exp(scan_mem.ranges[(int)floor(numero_amostras/2)] - 0.5) - 1);
+        
+        if(scan_mem.ranges[(int)floor(numero_amostras/3)] < .20) // -0.785 rad a uma distancia de 20cm
+            twist_teleop.linear.x *=
+            fmin(1, exp(scan_mem.ranges[(int)floor(numero_amostras/3)] - 0.10) - 1);
+        
+        if(scan_mem.ranges[(int)floor(2*numero_amostras/3)] < .20) // +0.785 rad a uma distancia de 20cm
+            twist_teleop.linear.x *=
+            fmin(1, exp(scan_mem.ranges[(int)floor(2*numero_amostras/3)] - 0.10) - 1);
+        
+    }
 
     //Se estiver andando no sentido negativo de x e houver obstaculos trazeiros
     else if (
