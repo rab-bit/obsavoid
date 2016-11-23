@@ -14,6 +14,7 @@ ros::Publisher pub;
 //Define amostras memoria de dados para LaserScan
 sensor_msgs::LaserScan scan_mem;
 
+int scan_mem_active = 0;
 
 //METODOS-------------------------------------------------------------------------
 
@@ -23,23 +24,36 @@ sensor_msgs::LaserScan scan_mem;
 **/
 void obstacleAvoidanceControl(geometry_msgs::Twist twist_teleop){
     
+    if (scan_mem_active == 0) return; //Verifica se a variavel scan_mem ja foi inicializada
+    
     int numero_amostras = (int) floor((scan_mem.angle_max - scan_mem.angle_min) / scan_mem.angle_increment);
     
-    int amostra = (int)floor(numero_amostras/2); // Leitura de 0 rad
-    float dist_obstaculo = scan_mem.ranges[amostra];
-    
-    //Se estiver andando no sentido positivo de x e houver obstaculo a menos de 1 metro
-    if (twist_teleop.linear.x > 0 && dist_obstaculo < 1)
-        twist_teleop.linear.x *= (exp(dist_obstaculo) - 1); //Reduz a velocidade exponencialmente
-    
-    //Se estiver andando no sentido negativo de x e houver obstaculos a menos de 1 metro
+    //Se estiver andando no sentido positivo de x e houver obstaculo frontal
+    if (twist_teleop.linear.x > 0 && 
+	(scan_mem.ranges[(int)floor(numero_amostras/2)] < 1 // 0 rad
+	|| scan_mem.ranges[(int)floor(numero_amostras/3)] < .15 // -0.785 rad
+	|| scan_mem.ranges[(int)floor(2*numero_amostras/3)] < .15) // +0.785 rad
+	)
+        twist_teleop.linear.x *= 
+		fmin(1 , //Maximo de 1 e
+			exp( //O exponencial de euler
+		    	    fmin( //Minimo entre
+			   	fmin(scan_mem.ranges[(int)floor(numero_amostras/2)], // 0 rad,
+					scan_mem.ranges[(int)floor(numero_amostras/3)] // -0.785 rad
+				), 
+			   	scan_mem.ranges[(int)floor(2*numero_amostras/3)] // e +0.785 rad
+			     ) - .5 //Distancia maxima entre o robo e a parede (velocidade = 0)
+			) - 1 //Desloca a funcao exponencial para o valor 0 do eixo y
+		); //Reduz a velocidade exponencialmente
+
+    //Se estiver andando no sentido negativo de x e houver obstaculos trazeiros
     else if (
              twist_teleop.linear.x < 0 &&
              (scan_mem.ranges[numero_amostras] < 1 // +2.355 rad
               || scan_mem.ranges[0] < 1) // -2.355 rad
              )
         twist_teleop.linear.x *=
-        (exp(fmin(scan_mem.ranges[numero_amostras], scan_mem.ranges[0])) - 1);
+        fmin(1, exp(fmin(scan_mem.ranges[numero_amostras], scan_mem.ranges[0]) -.8) - 1);
     
 //    //Limita a velocidade angular
 //    twist_teleop.angular.z = twist_teleop.linear.x;
@@ -103,6 +117,7 @@ void laserCallback(sensor_msgs::LaserScan scan)
     
     //Armazena a leitura atual
     scan_mem = scan;
+    scan_mem_active = 1;
     
 }
 
