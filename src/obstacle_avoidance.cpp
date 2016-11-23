@@ -52,27 +52,29 @@ void laserCallback(sensor_msgs::LaserScan scan)
     int numero_amostras = (int) floor((scan.angle_max - scan.angle_min) / scan.angle_increment);
     
     //Imprime informacoes do laser
+    // 0 se refere ao menor angulo: -2.355
+    // numero_amostras se refere ao maior angulo: +2.355
     int amostra = 0;
     ROS_INFO("I heard:");
-    ROS_INFO("MIN[%d]: [%lf]", amostra, scan.ranges[amostra]);
+    ROS_INFO("MIN[%d]: [%lf]", amostra, scan.ranges[amostra]); // -2.355 rad
     
-    amostra = (int)floor(numero_amostras/8);
-    ROS_INFO("---[%d]: [%lf]", amostra,  scan.ranges[amostra]);
+    amostra = (int)floor(numero_amostras/6);
+    ROS_INFO("---[%d]: [%lf]", amostra,  scan.ranges[amostra]); // -1.57 rad
     
-    amostra = (int)floor(numero_amostras/4);
-    ROS_INFO("---[%d]: [%lf]", amostra,  scan.ranges[amostra]);
+    amostra = (int)floor(numero_amostras/3);
+    ROS_INFO("---[%d]: [%lf]", amostra,  scan.ranges[amostra]); // -0.785 rad
     
     amostra = (int)floor(numero_amostras/2);
-    ROS_INFO("MED[%d]: [%lf]", amostra,  scan.ranges[amostra]);
+    ROS_INFO("MED[%d]: [%lf]", amostra,  scan.ranges[amostra]); // 0 rad
     
     amostra = (int)floor(2 * numero_amostras/3);
-    ROS_INFO("+++[%d]: [%lf]", amostra,  scan.ranges[amostra]);
+    ROS_INFO("+++[%d]: [%lf]", amostra,  scan.ranges[amostra]); // +0.785 rad
     
     amostra = (int)floor(5 * numero_amostras/6);
-    ROS_INFO("+++[%d]: [%lf]", amostra,  scan.ranges[amostra]);
+    ROS_INFO("+++[%d]: [%lf]", amostra,  scan.ranges[amostra]); // +1.57 rad
     
     amostra = numero_amostras;
-    ROS_INFO("MAX[%d]: [%lf]", amostra,  scan.ranges[amostra]);
+    ROS_INFO("MAX[%d]: [%lf]", amostra,  scan.ranges[amostra]); // +2.355 rad
     
     
 }
