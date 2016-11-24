@@ -7,6 +7,8 @@
 #include <math.h>
 
 
+#define BUBLE_SIZE 0.30 //< Tamanho da bolha
+
 //VARIAVEIS GLOBAIS---------------------------------------------------------------
 
 //Define publishers e subscribers
@@ -40,7 +42,26 @@ float getDistanceAverage(float angulo, sensor_msgs::LaserScan msg, int num_amost
         sum += msg.ranges[posicao_array - i];
     }
     
+    //Calcula media dos ranges
     return sum/(2*num_amostras);
+}
+
+
+/*********************************************************************************
+ * Deteccao de obstaculos
+ * 
+ * Se algum range for menor que o valor da bolha que envolve o robo, retorna 1
+ **/
+bool checkForObstacles(sensor_msgs::LaserScan msg){
+    
+    int numero_amostras = (int) floor((msg.angle_max - msg.angle_min) / msg.angle_increment);
+    
+    //Le as amostras a cada 10 unidades
+    for (int i = 0; i < numero_amostras; i+= 10)
+        if (msg.ranges[i] < BUBLE_SIZE) return true;
+    
+    return false;
+
 }
 
 /*********************************************************************************
@@ -51,37 +72,29 @@ void obstacleAvoidanceControl(geometry_msgs::Twist twist_teleop){
     
     if (scan_mem_active == 0) return; //Verifica se a variavel scan_mem ja foi inicializada
     
-    int numero_amostras = (int) floor((scan_mem.angle_max - scan_mem.angle_min) / scan_mem.angle_increment);
     
-    //Se estiver andando no sentido positivo de x e houver obstaculo frontal,
-    // reduz a velocidade exponencialmente
-    if (twist_teleop.linear.x > 0){
+    //Enquanto houver obstaculos, recalcula a tragetoria de forma ir para o angulo com o maior range
+    if (checkForObstacles(scan_mem)) {
+        ROS_INFO("Obstaculo!!");
+        //Computa novo angulo (desviar)
+        float soma_ang = 0.0;
+        float soma_rang = 0.0;
+        sensor_msgs::LaserScan msg = scan_mem;
         
-        if(scan_mem.ranges[(int)floor(numero_amostras/2)] < 1) // 0 rad a uma distancia de 1m
-            twist_teleop.linear.x *=
-            fmin(1, exp(scan_mem.ranges[(int)floor(numero_amostras/2)] - 0.5) - 1);
+        //A cada 10 amostras
+        for (float alpha = scan_mem.angle_min; alpha < msg.angle_max; alpha += msg.angle_increment*10){
+            
+            float obstacle_prox = 1/getDistanceAverage(alpha, msg, 2); //Quanto maior o range, mais perto o obstaculo
+            
+            soma_ang += alpha * obstacle_prox; //Calcula a soma dos angulos multiplicados aos valores de range
+            soma_rang += obstacle_prox; //Calcula soma dos valores de range
+        }
         
-        if(scan_mem.ranges[(int)floor(numero_amostras/3)] < .36) // -0.785 rad a uma distancia de 20cm
-            twist_teleop.linear.x *=
-            fmin(1, exp(scan_mem.ranges[(int)floor(numero_amostras/3)] - 0.10) - 1);
-        
-        if(scan_mem.ranges[(int)floor(2*numero_amostras/3)] < .36) // +0.785 rad a uma distancia de 20cm
-            twist_teleop.linear.x *=
-            fmin(1, exp(scan_mem.ranges[(int)floor(2*numero_amostras/3)] - 0.10) - 1);
-        
+        float rebound_angle = soma_ang/soma_rang; //Angulo de desvio
+        ROS_INFO("R Angle: [%f]", rebound_angle);
+        twist_teleop.angular.z = rebound_angle; //Ajusta o twist
+        pub.publish(twist_teleop);
     }
-
-    //Se estiver andando no sentido negativo de x e houver obstaculos trazeiros
-    else if (
-             twist_teleop.linear.x < 0 &&
-             (scan_mem.ranges[numero_amostras] < 1 // +2.355 rad
-              || scan_mem.ranges[0] < 1) // -2.355 rad
-             )
-        twist_teleop.linear.x *=
-        fmin(1, exp(fmin(scan_mem.ranges[numero_amostras], scan_mem.ranges[0]) -.8) - 1);
-    
-//    //Limita a velocidade angular
-//    twist_teleop.angular.z = twist_teleop.linear.x;
     
     //Publica twist para o cmd_vel robo
     pub.publish(twist_teleop);
@@ -118,27 +131,27 @@ void laserCallback(sensor_msgs::LaserScan scan)
     //Imprime informacoes do laser
     // 0 se refere ao menor angulo: -2.355
     // numero_amostras se refere ao maior angulo: +2.355
-    int amostra = 0;
-    ROS_INFO("I heard:");
-    ROS_INFO("MIN[%d]: [%lf]", amostra, scan.ranges[amostra]); // -2.355 rad
-    
-    amostra = (int)floor(numero_amostras/6);
-    ROS_INFO("---[%d]: [%lf]", amostra,  scan.ranges[amostra]); // -1.57 rad
-    
-    amostra = (int)floor(numero_amostras/3);
-    ROS_INFO("---[%d]: [%lf]", amostra,  scan.ranges[amostra]); // -0.785 rad
-    
-    amostra = (int)floor(numero_amostras/2);
-    ROS_INFO("MED[%d]: [%lf]", amostra,  scan.ranges[amostra]); // 0 rad
-    
-    amostra = (int)floor(2 * numero_amostras/3);
-    ROS_INFO("+++[%d]: [%lf]", amostra,  scan.ranges[amostra]); // +0.785 rad
-    
-    amostra = (int)floor(5 * numero_amostras/6);
-    ROS_INFO("+++[%d]: [%lf]", amostra,  scan.ranges[amostra]); // +1.57 rad
-    
-    amostra = numero_amostras;
-    ROS_INFO("MAX[%d]: [%lf]", amostra,  scan.ranges[amostra]); // +2.355 rad
+//    int amostra = 0;
+//    ROS_INFO("I heard:");
+//    ROS_INFO("MIN[%d]: [%lf]", amostra, scan.ranges[amostra]); // -2.355 rad
+//    
+//    amostra = (int)floor(numero_amostras/6);
+//    ROS_INFO("---[%d]: [%lf]", amostra,  scan.ranges[amostra]); // -1.57 rad
+//    
+//    amostra = (int)floor(numero_amostras/3);
+//    ROS_INFO("---[%d]: [%lf]", amostra,  scan.ranges[amostra]); // -0.785 rad
+//    
+//    amostra = (int)floor(numero_amostras/2);
+//    ROS_INFO("MED[%d]: [%lf]", amostra,  scan.ranges[amostra]); // 0 rad
+//    
+//    amostra = (int)floor(2 * numero_amostras/3);
+//    ROS_INFO("+++[%d]: [%lf]", amostra,  scan.ranges[amostra]); // +0.785 rad
+//    
+//    amostra = (int)floor(5 * numero_amostras/6);
+//    ROS_INFO("+++[%d]: [%lf]", amostra,  scan.ranges[amostra]); // +1.57 rad
+//    
+//    amostra = numero_amostras;
+//    ROS_INFO("MAX[%d]: [%lf]", amostra,  scan.ranges[amostra]); // +2.355 rad
     
     //Armazena a leitura atual
     scan_mem = scan;
