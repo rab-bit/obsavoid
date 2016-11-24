@@ -24,6 +24,26 @@ int scan_mem_active = 0;
 //METODOS-------------------------------------------------------------------------
 
 /*********************************************************************************
+ * Recebe o angulo central de uma amostra, a mensagem do laser e o numero de amostras vizinhas ao angulo recebido que serao utilizadas para o calculo de uma distancia media
+ **/
+float getDistanceAverage(float angulo, sensor_msgs::LaserScan msg, int num_amostras){
+    
+    //Obtem o numero total de amostras
+    int numero_amostras = (int) floor((msg.angle_max - msg.angle_min) / msg.angle_increment);
+    
+    int posicao_array = (int) floor((angulo - msg.angle_min)/msg.angle_increment);
+    
+    float sum = msg.ranges[posicao_array]; //Central
+    
+    for(int i = 1; i <= num_amostras; i++){
+        sum += msg.ranges[posicao_array + i];
+        sum += msg.ranges[posicao_array - i];
+    }
+    
+    return sum/(2*num_amostras);
+}
+
+/*********************************************************************************
  * Recebe informacoes dos sensores e de direcao. Publica comandos de velocidade 
  * evitando bater em obstaculos.
 **/
