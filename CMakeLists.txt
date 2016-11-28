@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(p3at_tutorial)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
 find_package(catkin REQUIRED COMPONENTS
   amcl
   base_local_planner
@@ -26,14 +28,15 @@ include_directories(
 )
 
 ## Declare a C++ library
- add_library(random_walk src/random_walk.cpp)
- target_link_libraries(random_walk ${catkin_LIBRARIES})
+# add_library(random_walk src/random_walk.cpp)
+# target_link_libraries(random_walk ${catkin_LIBRARIES})
 
 # Declare a C++ executable
- add_executable(random_walk_node src/random_walk_node.cpp)
- target_link_libraries(random_walk_node random_walk ${catkin_LIBRARIES})
+# add_executable(random_walk_node src/random_walk_node.cpp)
+# target_link_libraries(random_walk_node random_walk ${catkin_LIBRARIES})
 
 # Declara o C++ de obstacle avoidance
 add_executable(obstacle_avoidance src/obstacle_avoidance.cpp)
 target_link_libraries(obstacle_avoidance ${catkin_LIBRARIES})
+#target_compile_features(p3at_tutorial PRIVATE cxx_range_for)
 #add_dependencies(obstacle_avoidance beginner_tutorials_generate_messages_cpp)
