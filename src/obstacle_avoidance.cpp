@@ -4,6 +4,7 @@
 #include <sensor_msgs/LaserScan.h>
 #include <sstream>
 #include <math.h>
+#include <vector>
 
 #define BUBLE_SIZE 1 //< Tamanho da bolha
 
@@ -14,6 +15,10 @@ ros::Subscriber sub_laser;
 ros::Publisher pub;
 //Variavel que armazena a ultima leitura do laser
 sensor_msgs::LaserScan scan_mem;
+
+// Circular buffer that stores last 40 scan informations
+std::vector<sensor_msgs::LaserScan> laserScanBuffer;
+
 //Variavel que funciona como um semaforo que indica se scan_mem foi inicializada
 int scan_mem_active = 0;
 
@@ -151,8 +156,30 @@ void laserCallback(sensor_msgs::LaserScan scan)
     //    amostra = numero_amostras;
     //    ROS_INFO("MAX[%d]: [%lf]", amostra,  scan.ranges[amostra]); // +2.355 rad
     
-    //Armazena a leitura atual
+    laserScanBuffer.push_back(scan);
+    if(laserScanBuffer.size() >= 40)
+    {
+      // Erases oldest element
+      laserScanBuffer.erase(laserScanBuffer.begin());
+    }
+
     scan_mem = scan;
+    ROS_INFO("%f\t%f", scan.range_min, scan.range_max);
+    for(auto laserScan : laserScanBuffer)
+    {
+        for(auto range = scan.range_min ; range < scan.range_max ; range++)
+        {
+            scan_mem.ranges[range] += laserScan.ranges[range];
+        }
+    }
+
+    for(auto range = scan.range_min ; range < scan.range_max ; range++)
+    {
+        scan_mem.ranges[range] /= laserScanBuffer.size();
+    }
+
+    //Armazena a leitura atual
+    // scan_mem = scan;
     scan_mem_active = 1;
     
 }
