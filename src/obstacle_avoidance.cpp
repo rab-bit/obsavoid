@@ -5,8 +5,7 @@
 #include <sstream>
 #include <math.h>
 
-#define BUBLE_SIZE_FRONT .5 //< Tamanho da bolha na parte frontal
-#define BUBLE_SIZE_SIDE .20 //< Tamanho da bolha na parte lateral
+#define BUBLE_SIZE 1 //< Tamanho da bolha
 
 //VARIAVEIS GLOBAIS---------------------------------------------------------------
 //Define publishers e subscribers
@@ -51,14 +50,13 @@ bool checkForObstacles(sensor_msgs::LaserScan msg){
     
     //Le as amostras a cada 10 unidades
     for (int i = 0; i < numero_amostras; i+= 10){
-        if(i > numero_amostras/3 && i < 2*numero_amostras/3){ //45 graus - Deteccao frontal
-            if (msg.ranges[i] < BUBLE_SIZE_FRONT) return true;
-        }
-        else if(i > numero_amostras/6 && i < 5*numero_amostras/6) //90 graus - Deteccao lateral
-            if (msg.ranges[i] < BUBLE_SIZE_SIDE) return true;
+        if(i > numero_amostras/6 && i < 5*numero_amostras/6) //90 graus
+            if (msg.ranges[i] < BUBLE_SIZE) return true;
     }
     return false;
 }
+
+
 /*********************************************************************************
  * Recebe informacoes dos sensores e de direcao. Publica comandos de velocidade
  * evitando bater em obstaculos.
@@ -80,7 +78,9 @@ void obstacleAvoidanceControl(geometry_msgs::Twist twist_teleop){
         //A cada 10 amostras
         for (float alpha = scan_mem.angle_min; alpha < msg.angle_max; alpha += msg.angle_increment*10){
             
-            float obstacle_prox = getDistanceAverage(alpha, msg, 2); //Quanto maior o range, mais perto o obstaculo
+            float obstacle_prox = getDistanceAverage(alpha, msg, 4); //Quanto maior o range, mais perto o obstaculo
+            
+            ROS_INFO("[%f] rad:\t %f", alpha, obstacle_prox);
             
             soma_ang += alpha * obstacle_prox; //Calcula a soma dos angulos multiplicados aos valores de range
             soma_rang += obstacle_prox; //Calcula soma dos valores de range
@@ -89,10 +89,12 @@ void obstacleAvoidanceControl(geometry_msgs::Twist twist_teleop){
         }
         
         float rebound_angle = soma_ang/soma_rang; //Angulo de desvio
-        ROS_INFO("R Angle: [%f]", rebound_angle);
-        ROS_INFO("Nearest: [%f]", nearest);
-        twist_teleop.linear.x = 0; //Para o robo
-        twist_teleop.angular.z = rebound_angle * 2; //Ajusta o angulo
+        // ROS_INFO("R Angle: [%f]", rebound_angle);
+        //ROS_INFO("Nearest: [%f]", nearest);
+        
+        float hm = .2; //Constante que determina o nivel da perda de velocidade
+        twist_teleop.linear.x *= (1 - fmin(0.2/nearest, hm)/hm); //Controla a velocidade do robo
+        twist_teleop.angular.z += pow(rebound_angle, 2) * fmin(5, 5 - 2* (1/nearest)); //Ajusta o angulo
         //pub.publish(twist_teleop);//
     }
     
@@ -183,3 +185,4 @@ int main(int argc, char **argv)
     ros::spin();
     return 0;
 }
+
