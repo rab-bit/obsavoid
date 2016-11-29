@@ -5,6 +5,7 @@
 #include <sstream>
 #include <math.h>
 #include <vector>
+#include <chrono>
 
 #define BUBLE_SIZE_FRONT .5 //< Tamanho da bolha na parte frontal
 #define BUBLE_SIZE_SIDE .20 //< Tamanho da bolha na parte lateral
@@ -22,6 +23,15 @@ std::vector<sensor_msgs::LaserScan> laserScanBuffer;
 
 //Variavel que funciona como um semaforo que indica se scan_mem foi inicializada
 int scan_mem_active = 0;
+
+double angulo_global = 0;
+double velocidade = 0;
+unsigned long time_g = 0;
+bool rotina_retorno;
+
+bool hasSpace (double angulo, sensor_msgs::LaserScan msg);
+int getDirection(double angulo_gb);
+
 
 //METODOS-------------------------------------------------------------------------
 /*********************************************************************************
@@ -69,6 +79,9 @@ bool checkForObstacles(sensor_msgs::LaserScan msg){
  * evitando bater em obstaculos.
  **/
 void obstacleAvoidanceControl(geometry_msgs::Twist twist_teleop){
+
+	unsigned long now = static_cast<long int>(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count());
+	
     
     if (scan_mem_active == 0) return; //Verifica se a variavel scan_mem ja foi inicializada
     
@@ -96,13 +109,60 @@ void obstacleAvoidanceControl(geometry_msgs::Twist twist_teleop){
         float rebound_angle = soma_ang/soma_rang; //Angulo de desvio
         ROS_INFO("R Angle: [%f]", rebound_angle);
         ROS_INFO("Nearest: [%f]", nearest);
+
+	//now e igual ao valor em microssegundos do computador
+	angulo_global += velocidade * (double)(now - time_g); //acertar as grandezas escalares
+	velocidade = rebound_angle *2;
+	time_g = now;
+	
+	 ROS_INFO("Angulo: [%lf]", angulo_global);
         twist_teleop.linear.x = 0; //Para o robo
         twist_teleop.angular.z = rebound_angle * 2; //Ajusta o angulo
+
         //pub.publish(twist_teleop);//
-    }
-    
+    } else{
+	//now e igual ao valor em microssegundos do computador
+	angulo_global += velocidade * (now - time_g); //acertar as grandezas escalares
+	velocidade = 0;
+	time_g = now;
+	
+	 if(abs(angulo_global) > 0){
+		ROS_INFO("Tento retornar!!");
+		
+		if(hasSpace(angulo_global, scan_mem)){
+			twist_teleop.angular.z = getDirection(angulo_global); //Ajusta o angulo	
+			velocidade = twist_teleop.angular.z;		
+		}
+		
+	}
+    }    
     //Publica twist para o cmd_vel robo
     pub.publish(twist_teleop);
+}
+bool hasSpace (double angulo, sensor_msgs::LaserScan msg) {
+    
+    int posicao_array = (int) floor((angulo - msg.angle_min)/msg.angle_increment);
+        if(posicao_array < 3)
+	posicao_array = 3;
+
+    float sum = msg.ranges[posicao_array]; //Central
+
+    for(int i = 1; i <= 3; i++){
+        sum += msg.ranges[posicao_array + i];
+        sum += msg.ranges[posicao_array - i];
+    }
+    
+    //Calcula media dos ranges
+    if ((sum/7) > BUBLE_SIZE_SIDE) 
+	return true;
+    return false;
+
+} 
+int getDirection(double angulo_gb) {
+	if(angulo_gb > 0) 
+		return -0.2;
+	return 0.2;
+	
 }
 /*********************************************************************************
  * Callback da escuta de informacoes de velocidade
