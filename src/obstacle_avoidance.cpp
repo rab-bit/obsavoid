@@ -23,8 +23,11 @@ std::vector<sensor_msgs::LaserScan> laserScanBuffer;
 int scan_mem_active = 0;
 
 //METODOS-------------------------------------------------------------------------
+
 /*********************************************************************************
- * Recebe o angulo central de uma amostra, a mensagem do laser e o numero de amostras vizinhas ao angulo recebido que serao utilizadas para o calculo de uma distancia media
+ * Recebe o angulo central de uma amostra, a mensagem do laser e o numero de 
+ * amostras vizinhas ao angulo recebido que serao utilizadas para o calculo de uma
+ * distancia media
  **/
 float getDistanceAverage(float angulo, sensor_msgs::LaserScan msg, int num_amostras){
     
@@ -73,39 +76,56 @@ void obstacleAvoidanceControl(geometry_msgs::Twist twist_teleop){
     
     //Enquanto houver obstaculos, recalcula a tragetoria de forma ir para o angulo com o maior range
     if (checkForObstacles(scan_mem)) {
-        ROS_INFO("Obstaculo!!");
-        //Computa novo angulo (desviar)
-        float soma_ang = 0.0;
-        float soma_rang = 0.0;
-        float nearest = 40.0;
-        sensor_msgs::LaserScan msg = scan_mem;
         
-        //A cada 10 amostras
-        for (float alpha = scan_mem.angle_min; alpha < msg.angle_max; alpha += msg.angle_increment*10){
+        //Computa novo angulo (desviar)
+        sensor_msgs::LaserScan msg = scan_mem;
+        float angulo_setor = 0.0872665; //< Angulo por setor (5graus)
+        float angulo_abertura = 1.5708; //< Angulo maximo de abertura do laser para cada lado (90graus)
+        float a = 60; //Magnitude maxima
+        float b = 2; // 0 = a - 30b
+        float limite = 56; //Limite para detectar vales
+        int s_max = 18; //Numero de setores livres consecutivos para o robo passar
+        int val_counter = 0; //Contador de setores por vale
+        float best_val_ang = -95; //Vetor medio do melhor vale escolhido
+        
+        //A cada setor de -90 a 90
+        for (float alpha = (-1)*angulo_abertura; alpha < angulo_abertura; alpha += angulo_setor){
             
-            float obstacle_prox = getDistanceAverage(alpha, msg, 4); //Quanto maior o range, mais perto o obstaculo
+            float c = 1; //Probabilidade de haver um obstaculo no setor
+            float obstacle_prox = getDistanceAverage(alpha, msg, 5); //Range medio de 11 medidas
             
             ROS_INFO("[%f] rad:\t %f", alpha, obstacle_prox);
             
-            soma_ang += alpha * obstacle_prox; //Calcula a soma dos angulos multiplicados aos valores de range
-            soma_rang += obstacle_prox; //Calcula soma dos valores de range
+            //Calcula magnitude
+            float m = pow(c,2) * (a - b*obstacle_prox);
             
-            if (obstacle_prox < nearest) nearest = obstacle_prox;
+            //Verifica vales
+            if (m > limite){ //Se o valor atual for maior que o limite
+                //Se o numero de setores for maior que o determinado e este for mais proximo do angulo atual que o anterior
+                if (val_counter >= s_max && abs(s_max - twist_teleop.angular.z) < abs(best_val_ang - twist_teleop.angular.z))
+                    best_val_ang = alpha - (val_counter * angulo_setor)/2; //Calcula angulo central resultante
+                
+                val_counter = 0; //Reseta o contadoe
+            }
+                
+            else val_counter++;
         }
         
-        float rebound_angle = soma_ang/soma_rang; //Angulo de desvio
-        // ROS_INFO("R Angle: [%f]", rebound_angle);
-        //ROS_INFO("Nearest: [%f]", nearest);
+        //O melhor angulo eh o escolhido pelo loop
+        twist_teleop.angular.z = best_val_ang;
         
-        float hm = .2; //Constante que determina o nivel da perda de velocidade
-        twist_teleop.linear.x *= (1 - fmin(0.2/nearest, hm)/hm); //Controla a velocidade do robo
-        twist_teleop.angular.z += pow(rebound_angle, 2) * fmin(5, 5 - 2* (1/nearest)); //Ajusta o angulo
-        //pub.publish(twist_teleop);//
+        //Controle da velocidade
+        float best_val_mag = getDistanceAverage(best_val_ang, msg, 5); //Magnitude da direcao escolhida
+        float hm = 59; //Constante que determina o nivel da perda de velocidade
+        twist_teleop.linear.x *= (1 - fmin(best_val_mag, hm)/hm); //Controla a velocidade do robo
+        
     }
     
     //Publica twist para o cmd_vel robo
     pub.publish(twist_teleop);
 }
+
+
 /*********************************************************************************
  * Callback da escuta de informacoes de velocidade
  **/
