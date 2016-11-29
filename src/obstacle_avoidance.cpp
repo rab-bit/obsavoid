@@ -75,18 +75,19 @@ void obstacleAvoidanceControl(geometry_msgs::Twist twist_teleop){
     
     
     //Enquanto houver obstaculos, recalcula a tragetoria de forma ir para o angulo com o maior range
-    if (checkForObstacles(scan_mem)) {
-        
+    if (true){ //(checkForObstacles(scan_mem)) {
+        ROS_INFO("-------------------------------");
+        ROS_INFO("-------------------------------");
         //Computa novo angulo (desviar)
         sensor_msgs::LaserScan msg = scan_mem;
         float angulo_setor = 0.0872665; //< Angulo por setor (5graus)
-        float angulo_abertura = 1.5708; //< Angulo maximo de abertura do laser para cada lado (90graus)
+        float angulo_abertura = 1.5708/2; //< Angulo maximo de abertura do laser para cada lado (45graus)
         float a = 60; //Magnitude maxima
         float b = 2; // 0 = a - 30b
         float limite = 56; //Limite para detectar vales
-        int s_max = 18; //Numero de setores livres consecutivos para o robo passar
+        int s_max = 3; //Numero de setores livres consecutivos para o robo passar
         int val_counter = 0; //Contador de setores por vale
-        float best_val_ang = -95; //Vetor medio do melhor vale escolhido
+        float best_val_ang = 1.6; //Vetor central do melhor vale escolhido
         
         //A cada setor de -90 a 90
         for (float alpha = (-1)*angulo_abertura; alpha < angulo_abertura; alpha += angulo_setor){
@@ -94,31 +95,44 @@ void obstacleAvoidanceControl(geometry_msgs::Twist twist_teleop){
             float c = 1; //Probabilidade de haver um obstaculo no setor
             float obstacle_prox = getDistanceAverage(alpha, msg, 5); //Range medio de 11 medidas
             
-            ROS_INFO("[%f] rad:\t %f", alpha, obstacle_prox);
-            
             //Calcula magnitude
             float m = pow(c,2) * (a - b*obstacle_prox);
+
+	    ROS_INFO("[%f] rad:\t %f", alpha, m);
             
             //Verifica vales
-            if (m > limite){ //Se o valor atual for maior que o limite
-                //Se o numero de setores for maior que o determinado e este for mais proximo do angulo atual que o anterior
-                if (val_counter >= s_max && abs(s_max - twist_teleop.angular.z) < abs(best_val_ang - twist_teleop.angular.z))
-                    best_val_ang = alpha - (val_counter * angulo_setor)/2; //Calcula angulo central resultante
-                
-                val_counter = 0; //Reseta o contadoe
+            if (m > limite || alpha+angulo_setor >= angulo_abertura){ //Se o valor atual for maior que o limite
+                //Se o numero de setores for maior que o determinado e este for mais proximo do angulo atual que o anterior	
+		ROS_INFO("-M:\t %f", m);
+		ROS_INFO("-C:\t %d", val_counter);	
+		if (val_counter >= s_max){
+           	 float val_ang = alpha - (val_counter * angulo_setor)/2; //Calcula angulo central resultante
+            		//Se o angulo for mais proximo que o atual
+	      		if (abs(val_ang - twist_teleop.angular.z) < abs(best_val_ang - twist_teleop.angular.z))
+    				best_val_ang = val_ang;
+		}
+                val_counter = 0; //Reseta o contador
             }
                 
             else val_counter++;
+	    ROS_INFO("C:\t %d", val_counter);
         }
         
         //O melhor angulo eh o escolhido pelo loop
         twist_teleop.angular.z = best_val_ang;
+
+	ROS_INFO("Best rad:\t %f", best_val_ang);
+	ROS_INFO("Twis rad:\t %f", twist_teleop.angular.z);
         
         //Controle da velocidade
         float best_val_mag = getDistanceAverage(best_val_ang, msg, 5); //Magnitude da direcao escolhida
-        float hm = 59; //Constante que determina o nivel da perda de velocidade
+	best_val_mag = pow(1,2) * (a - b*best_val_mag);
+
+	ROS_INFO("Best mag:\t %f", best_val_mag);
+
+        float hm = 58; //Constante que determina o nivel da perda de velocidade
         twist_teleop.linear.x *= (1 - fmin(best_val_mag, hm)/hm); //Controla a velocidade do robo
-        
+        ROS_INFO("X:\t %f", twist_teleop.linear.x);
     }
     
     //Publica twist para o cmd_vel robo
@@ -184,7 +198,7 @@ void laserCallback(sensor_msgs::LaserScan scan)
     }
 
     scan_mem = scan;
-    ROS_INFO("%f\t%f", scan.range_min, scan.range_max);
+    //ROS_INFO("%f\t%f", scan.range_min, scan.range_max);
     for(auto laserScan : laserScanBuffer)
     {
         for(auto range = scan.range_min ; range < scan.range_max ; range++)
