@@ -6,7 +6,9 @@
 #include <math.h>
 #include <vector>
 
-#define BUBLE_SIZE 1 //< Tamanho da bolha
+#define BUBLE_SIZE .7 //< Tamanho da bolha
+#define MAX_SPEED 1
+#define MIN_SPEED 0
 
 //VARIAVEIS GLOBAIS---------------------------------------------------------------
 //Define publishers e subscribers
@@ -52,14 +54,14 @@ float getDistanceAverage(float angulo, sensor_msgs::LaserScan msg, int num_amost
  *
  * Se algum range for menor que o valor da bolha que envolve o robo, retorna 1
  **/
-bool checkForObstacles(sensor_msgs::LaserScan msg){
+bool checkForObstacles(sensor_msgs::LaserScan msg, float limite){
     
     int numero_amostras = (int) floor((msg.angle_max - msg.angle_min) / msg.angle_increment);
     
     //Le as amostras a cada 10 unidades
     for (int i = 0; i < numero_amostras; i+= 10){
         if(i > numero_amostras/6 && i < 5*numero_amostras/6) //90 graus
-            if (msg.ranges[i] < BUBLE_SIZE) return true;
+            if (msg.ranges[i] < limite) return true;
     }
     return false;
 }
@@ -88,20 +90,25 @@ void obstacleAvoidanceControl(geometry_msgs::Twist twist_teleop){
     
     if (scan_mem_active == 0) return; //Verifica se a variavel scan_mem ja foi inicializada
     
+    //Filtra velocidade maxima (e impede de andar no sentido negativo)
+    twist_teleop.linear.x = fmax(0, fmin(MAX_SPEED, twist_teleop.linear.x));
+    
+    //Armazena dados de leitura
+    sensor_msgs::LaserScan msg = scan_mem;
+    
+    //Calcula raio da bolha de acordo com a velocidade do robo
+    float tam_bolha = fmax(BUBLE_SIZE , BUBLE_SIZE * twist_teleop.linear.x);
+    
     
     //Enquanto houver obstaculos, recalcula a tragetoria de forma ir para o angulo com o maior range
-    if (true){ //(checkForObstacles(scan_mem)) {
-        
-        ROS_INFO("-------------------------------");
-        ROS_INFO("-------------------------------");
+    if (checkForObstacles(msg, tam_bolha)){
         
         //Computa novo angulo (desviar)
-        sensor_msgs::LaserScan msg = scan_mem;
         float angulo_setor = 0.0872665; //< Angulo por setor (5graus)
         float angulo_abertura = 1.5708; //< Angulo maximo de abertura do laser para cada lado (90 graus)
         float a = 60; //Magnitude maxima
         float b = 2; // 0 = a - 30b
-        float limite = 56; //Limite para detectar vales
+        float limite = 60 - tam_bolha*2; //Limite para detectar vales
         int s_max = 8; //Numero de setores livres consecutivos para o robo passar
         int sec_counter = 0; //Contador de setores por vale
         float best_val_ang = (-1)*angulo_abertura; //Vetor central do melhor vale escolhido
@@ -111,7 +118,7 @@ void obstacleAvoidanceControl(geometry_msgs::Twist twist_teleop){
         int num_vales = 0;
         
         //---------------------------------------------------------------------
-        //A cada setor de -45 a 45, verifica os possiveis vales
+        //A cada setor de -angulo_abertura a angulo_abertura, verifica os possiveis vales
         for (float alpha = (-1)*angulo_abertura; alpha < angulo_abertura; alpha += angulo_setor){
             
             float c = 1; //Probabilidade de haver um obstaculo no setor
@@ -119,17 +126,16 @@ void obstacleAvoidanceControl(geometry_msgs::Twist twist_teleop){
             float m = pow(c,2) * (a - b*dist_setor); //Calcula magnitude
             
             //Verifica possiveis vales
-            if (m > limite || sec_counter >= s_max){ //Se o valor atual for maior que o limite
+            //Se o valor atual for maior que o limite (ou percorreu todas as amostras)
+            if (m > limite || alpha+angulo_setor >= angulo_abertura){
                 if (sec_counter >= s_max) //Se o vale tiver o numero minimo de setores
                     vales[num_vales++] = alpha - (sec_counter * angulo_setor)/2; //Calcula angulo central resultante do vale
                 
                 //Reseta o contador
                 sec_counter = 0;
             }
-            
             else sec_counter++;
         }
-        
         
         //---------------------------------------------------------------------
         //Se nao encontrou nenhum vale
@@ -141,30 +147,21 @@ void obstacleAvoidanceControl(geometry_msgs::Twist twist_teleop){
         //---------------------------------------------------------------------
         //Encontrou vale(s)
         else {
-            ROS_INFO("Teleop_an:\t %f", twist_teleop.angular.z);
-            ROS_INFO("num_vales:\t %d", num_vales);
-            for(int i = 0; i < num_vales; i++)
-                ROS_INFO("Vale[%d]:\t %f", i, vales[i]);
-            
             //Escolhe o angulo referente ao vale mais proximo
             twist_teleop.angular.z = nearestAngle(twist_teleop.angular.z, vales, num_vales);
-        
-            ROS_INFO("m_vale:\t %f", twist_teleop.angular.z);
             
             //Controle da velocidade
             float c = 1; //Probabilidade de haver um obstaculo no setor
             float dist_vale = getDistanceAverage(twist_teleop.angular.z, msg, 5); //Range do vale escolhido
             float m = pow(c,2) * (a - b*dist_vale); //Calcula magnitude
             
-            
             float hm = 158; //Constante que determina o nivel da perda de velocidade
-            twist_teleop.linear.x *= (1 - fmin(m, hm)/hm); //Controla a velocidade do robo
-            ROS_INFO("-X:\t %f", (1 - fmin(m, hm)/hm));
-            ROS_INFO("=X:\t %f", twist_teleop.linear.x);
-        
+            twist_teleop.linear.x *= (1 - fmin(m, hm)/hm); //Controla a velocidade do robo pela magnitude do vale
+            
+            //Controla a velocidade pela diferenca angular
+            twist_teleop.linear.x = twist_teleop.linear.x * (1 - fabs(1.5*twist_teleop.angular.z)/angulo_abertura) + MIN_SPEED;
         }
     }
-    
     //Publica twist para o cmd_vel robo
     pub.publish(twist_teleop);
 }
@@ -175,50 +172,16 @@ void obstacleAvoidanceControl(geometry_msgs::Twist twist_teleop){
  **/
 void teleopCallback(geometry_msgs::Twist twist_teleop)
 {
-    //Imprime informacoes de twist
-    //  ROS_INFO("I heard:");
-    //  ROS_INFO("Lin X: [%f]", twist_teleop.linear.x);
-    //  ROS_INFO("Lin Y: [%f]", twist_teleop.linear.y);
-    //  ROS_INFO("Ang Z: [%f]", twist_teleop.angular.z);
-    
     //Altera o twist devido a obstaculos TODO
     obstacleAvoidanceControl(twist_teleop);
-    
-    
 }
+
+
 /*********************************************************************************
  * Callback da escuta de informacoes do laser
  **/
 void laserCallback(sensor_msgs::LaserScan scan)
 {
-    
-    //Calcula Numero de Amostras
-    int numero_amostras = (int) floor((scan.angle_max - scan.angle_min) / scan.angle_increment);
-    
-    //Imprime informacoes do laser
-    // 0 se refere ao menor angulo: -2.355
-    // numero_amostras se refere ao maior angulo: +2.355
-    //    int amostra = 0;
-    //    ROS_INFO("I heard:");
-    //    ROS_INFO("MIN[%d]: [%lf]", amostra, scan.ranges[amostra]); // -2.355 rad
-    //
-    //    amostra = (int)floor(numero_amostras/6);
-    //    ROS_INFO("---[%d]: [%lf]", amostra,  scan.ranges[amostra]); // -1.57 rad
-    //
-    //    amostra = (int)floor(numero_amostras/3);
-    //    ROS_INFO("---[%d]: [%lf]", amostra,  scan.ranges[amostra]); // -0.785 rad
-    //
-    //    amostra = (int)floor(numero_amostras/2);
-    //    ROS_INFO("MED[%d]: [%lf]", amostra,  scan.ranges[amostra]); // 0 rad
-    //
-    //    amostra = (int)floor(2 * numero_amostras/3);
-    //    ROS_INFO("+++[%d]: [%lf]", amostra,  scan.ranges[amostra]); // +0.785 rad
-    //
-    //    amostra = (int)floor(5 * numero_amostras/6);
-    //    ROS_INFO("+++[%d]: [%lf]", amostra,  scan.ranges[amostra]); // +1.57 rad
-    //
-    //    amostra = numero_amostras;
-    //    ROS_INFO("MAX[%d]: [%lf]", amostra,  scan.ranges[amostra]); // +2.355 rad
     
     laserScanBuffer.push_back(scan);
     if(laserScanBuffer.size() >= 40)
@@ -242,22 +205,19 @@ void laserCallback(sensor_msgs::LaserScan scan)
         scan_mem.ranges[range] /= laserScanBuffer.size();
     }
     
-    //Armazena a leitura atual
-    // scan_mem = scan;
+    //Informa inicializacao da scan_mem
     scan_mem_active = 1;
     
 }
+
+
 /*********************************************************************************
  **/
 int main(int argc, char **argv)
 {
     //Inicializa o noh
     ros::init(argc, argv, "obstacle_avoidance");
-    /**
-     * NodeHandle is the main access point to communications with the ROS system.
-     * The first NodeHandle constructed will fully initialize this node, and the last
-     * NodeHandle destructed will close down the node.
-     */
+    
     ros::NodeHandle n;
     
     //Define as publicacoes de twist para o cmd_vel do robo
@@ -268,12 +228,9 @@ int main(int argc, char **argv)
     sub_laser = n.subscribe("/hokuyo_scan", 100, laserCallback);
     //Define a escuta do topico com as velocidades fornecidas pelo turtlebot
     sub = n.subscribe("/cmd_vel_mux/input/teleop", 100, teleopCallback);
-    /**
-     * ros::spin() will enter a loop, pumping callbacks.  With this version, all
-     * callbacks will be called from within this thread (the main one).  ros::spin()
-     * will exit when Ctrl-C is pressed, or the node is shutdown by the master.
-     */
+    
     ros::spin();
+    
     return 0;
 }
 
