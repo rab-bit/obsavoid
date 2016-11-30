@@ -25,7 +25,7 @@ int scan_mem_active = 0;
 //METODOS-------------------------------------------------------------------------
 
 /*********************************************************************************
- * Recebe o angulo central de uma amostra, a mensagem do laser e o numero de 
+ * Recebe o angulo central de uma amostra, a mensagem do laser e o numero de
  * amostras vizinhas ao angulo recebido que serao utilizadas para o calculo de uma
  * distancia media
  **/
@@ -66,6 +66,21 @@ bool checkForObstacles(sensor_msgs::LaserScan msg){
 
 
 /*********************************************************************************
+ * Calcula em um conjunto de angulos, o mais proximo de um angulo determinado.
+ *
+ **/
+float nearestAngle(float angle, float* angles, int num_angles){
+    
+    float nearest = 999;
+
+    for (int i = 0; i < num_angles; i++)
+        if(fabs(angles[i] - angle) < fabs(nearest - angle))
+            nearest = angles[i];
+
+    return nearest;
+}
+
+/*********************************************************************************
  * Recebe informacoes dos sensores e de direcao. Publica comandos de velocidade
  * evitando bater em obstaculos.
  **/
@@ -76,67 +91,78 @@ void obstacleAvoidanceControl(geometry_msgs::Twist twist_teleop){
     
     //Enquanto houver obstaculos, recalcula a tragetoria de forma ir para o angulo com o maior range
     if (true){ //(checkForObstacles(scan_mem)) {
+        
         ROS_INFO("-------------------------------");
-	ROS_INFO("-------------------------------");
+        ROS_INFO("-------------------------------");
+        
         //Computa novo angulo (desviar)
         sensor_msgs::LaserScan msg = scan_mem;
         float angulo_setor = 0.0872665; //< Angulo por setor (5graus)
-        float angulo_abertura = 1.5708/2; //< Angulo maximo de abertura do laser para cada lado (45graus)
+        float angulo_abertura = 1.5708; //< Angulo maximo de abertura do laser para cada lado (90 graus)
         float a = 60; //Magnitude maxima
         float b = 2; // 0 = a - 30b
         float limite = 56; //Limite para detectar vales
         int s_max = 8; //Numero de setores livres consecutivos para o robo passar
-        int val_counter = 0; //Contador de setores por vale
-        float best_val_ang = 1.6; //Vetor central do melhor vale escolhido
+        int sec_counter = 0; //Contador de setores por vale
+        float best_val_ang = (-1)*angulo_abertura; //Vetor central do melhor vale escolhido
+        float best_val_mag = 0; //Magnitude do melhor vale
         
-        //A cada setor de -45 a 45
+        float vales[(int)ceil(2*angulo_abertura/angulo_setor)]; //Resultado dos vales
+        int num_vales = 0;
+        
+        //---------------------------------------------------------------------
+        //A cada setor de -45 a 45, verifica os possiveis vales
         for (float alpha = (-1)*angulo_abertura; alpha < angulo_abertura; alpha += angulo_setor){
             
             float c = 1; //Probabilidade de haver um obstaculo no setor
-            float obstacle_prox = getDistanceAverage(alpha, msg, 5); //Range medio de 11 medidas
+            float dist_setor = getDistanceAverage(alpha, msg, 5); //Range do setor atual
+            float m = pow(c,2) * (a - b*dist_setor); //Calcula magnitude
             
-            //Calcula magnitude
-            float m = pow(c,2) * (a - b*obstacle_prox);
-
-	    //ROS_INFO("[%f] rad:\t %f", alpha, m);
-            
-            //Verifica vales
-            if (m > limite || alpha+angulo_setor >= angulo_abertura){ //Se o valor atual for maior que o limite
-                //Se o numero de setores for maior que o determinado e este for mais proximo do angulo atual que o anterior	
-		//ROS_INFO("-M:\t %f", m);
-		//ROS_INFO("-C:\t %d", val_counter);	
-		if (val_counter >= s_max){
-           	 float val_ang = alpha - (val_counter * angulo_setor)/2; //Calcula angulo central resultante
-            		//Se o angulo for mais proximo que o atual
-	      		if (abs(val_ang - twist_teleop.angular.z) < abs(best_val_ang - twist_teleop.angular.z)){
-				//ROS_INFO("+S:\t %f", val_ang);
-				best_val_ang = val_ang;			
-			}
-    				
-		}
-                val_counter = 0; //Reseta o contador
-            }
+            //Verifica possiveis vales
+            if (m > limite || sec_counter >= s_max){ //Se o valor atual for maior que o limite
+                if (sec_counter >= s_max) //Se o vale tiver o numero minimo de setores
+                    vales[num_vales++] = alpha - (sec_counter * angulo_setor)/2; //Calcula angulo central resultante do vale
                 
-            else val_counter++;
-	    //ROS_INFO("C:\t %d", val_counter);
+                //Reseta o contador
+                sec_counter = 0;
+            }
+            
+            else sec_counter++;
         }
         
-        //O melhor angulo eh o escolhido pelo loop
-        twist_teleop.angular.z = best_val_ang;
-
-	//ROS_INFO("Best rad:\t %f", best_val_ang);
-	//ROS_INFO("Twis rad:\t %f", twist_teleop.angular.z);
         
-        //Controle da velocidade
-        float best_val_mag = getDistanceAverage(best_val_ang, msg, 5); //Magnitude da direcao escolhida
-	best_val_mag = pow(1,2) * (a - b*best_val_mag);
-
-	ROS_INFO("Best mag:\t %f", best_val_mag);
-
-        float hm = 158; //Constante que determina o nivel da perda de velocidade
-        twist_teleop.linear.x *= (1 - fmin(best_val_mag, hm)/hm); //Controla a velocidade do robo
-	ROS_INFO("-X:\t %f", (1 - fmin(best_val_mag, hm)/hm));        
-	ROS_INFO("=X:\t %f", twist_teleop.linear.x);
+        //---------------------------------------------------------------------
+        //Se nao encontrou nenhum vale
+        if (num_vales == 0){
+            twist_teleop.linear.x = 0; //Fica parado
+            twist_teleop.angular.z = -1; //E girando em torno do proprio eixo
+        }
+        
+        //---------------------------------------------------------------------
+        //Encontrou vale(s)
+        else {
+            ROS_INFO("Teleop_an:\t %f", twist_teleop.angular.z);
+            ROS_INFO("num_vales:\t %d", num_vales);
+            for(int i = 0; i < num_vales; i++)
+                ROS_INFO("Vale[%d]:\t %f", i, vales[i]);
+            
+            //Escolhe o angulo referente ao vale mais proximo
+            twist_teleop.angular.z = nearestAngle(twist_teleop.angular.z, vales, num_vales);
+        
+            ROS_INFO("m_vale:\t %f", twist_teleop.angular.z);
+            
+            //Controle da velocidade
+            float c = 1; //Probabilidade de haver um obstaculo no setor
+            float dist_vale = getDistanceAverage(twist_teleop.angular.z, msg, 5); //Range do vale escolhido
+            float m = pow(c,2) * (a - b*dist_vale); //Calcula magnitude
+            
+            
+            float hm = 158; //Constante que determina o nivel da perda de velocidade
+            twist_teleop.linear.x *= (1 - fmin(m, hm)/hm); //Controla a velocidade do robo
+            ROS_INFO("-X:\t %f", (1 - fmin(m, hm)/hm));
+            ROS_INFO("=X:\t %f", twist_teleop.linear.x);
+        
+        }
     }
     
     //Publica twist para o cmd_vel robo
@@ -197,10 +223,10 @@ void laserCallback(sensor_msgs::LaserScan scan)
     laserScanBuffer.push_back(scan);
     if(laserScanBuffer.size() >= 40)
     {
-      // Erases oldest element
-      laserScanBuffer.erase(laserScanBuffer.begin());
+        // Erases oldest element
+        laserScanBuffer.erase(laserScanBuffer.begin());
     }
-
+    
     scan_mem = scan;
     //ROS_INFO("%f\t%f", scan.range_min, scan.range_max);
     for(auto laserScan : laserScanBuffer)
@@ -210,12 +236,12 @@ void laserCallback(sensor_msgs::LaserScan scan)
             scan_mem.ranges[range] += laserScan.ranges[range];
         }
     }
-
+    
     for(auto range = scan.range_min ; range < scan.range_max ; range++)
     {
         scan_mem.ranges[range] /= laserScanBuffer.size();
     }
-
+    
     //Armazena a leitura atual
     // scan_mem = scan;
     scan_mem_active = 1;
