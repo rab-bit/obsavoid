@@ -35,8 +35,12 @@ include_directories(
 # add_executable(random_walk_node src/random_walk_node.cpp)
 # target_link_libraries(random_walk_node random_walk ${catkin_LIBRARIES})
 
+# Declara a C++ de VFH
+add_library(VFH src/VFH.cpp)
+target_link_libraries(VFH ${catkin_LIBRARIES})
+
 # Declara o C++ de obstacle avoidance
 add_executable(obstacle_avoidance src/obstacle_avoidance.cpp)
-target_link_libraries(obstacle_avoidance ${catkin_LIBRARIES})
+target_link_libraries(obstacle_avoidance VFH ${catkin_LIBRARIES})
 #target_compile_features(p3at_tutorial PRIVATE cxx_range_for)
 #add_dependencies(obstacle_avoidance beginner_tutorials_generate_messages_cpp)
