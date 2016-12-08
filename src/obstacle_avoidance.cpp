@@ -105,7 +105,7 @@ void laserCallback(sensor_msgs::LaserScan scan)
 {
     
     laserScanBuffer.push_back(scan);
-    if(laserScanBuffer.size() >= 40)
+    if(laserScanBuffer.size() > 40)
     {
         // Erases oldest element
         laserScanBuffer.erase(laserScanBuffer.begin());
