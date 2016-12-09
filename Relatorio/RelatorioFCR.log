@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.11.21)  9 DEC 2016 13:13
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.11.21)  9 DEC 2016 14:00
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -239,6 +239,14 @@ File: listings.cfg 2014/09/06 1.5e listings configuration
 ))
 Package: listings 2014/09/06 1.5e (Carsten Heinz)
 
+(/usr/local/texlive/2015/texmf-dist/tex/latex/float/float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count100
+\float@exts=\toks25
+\float@box=\box30
+\@float@everytoks=\toks26
+\@floatcapt=\box31
+)
 (./RelatorioFCR.aux
 
 LaTeX Warning: Label `cod:vales' multiply defined.
@@ -246,19 +254,19 @@ LaTeX Warning: Label `cod:vales' multiply defined.
 )
 \openout1 = `RelatorioFCR.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 53.
-LaTeX Font Info:    ... okay on input line 53.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 53.
-LaTeX Font Info:    ... okay on input line 53.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 53.
-LaTeX Font Info:    ... okay on input line 53.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 53.
-LaTeX Font Info:    ... okay on input line 53.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 53.
-LaTeX Font Info:    ... okay on input line 53.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 53.
-LaTeX Font Info:    ... okay on input line 53.
-LaTeX Font Info:    Try loading font information for OT1+lmss on input line 53.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 54.
+LaTeX Font Info:    ... okay on input line 54.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 54.
+LaTeX Font Info:    ... okay on input line 54.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 54.
+LaTeX Font Info:    ... okay on input line 54.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 54.
+LaTeX Font Info:    ... okay on input line 54.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 54.
+LaTeX Font Info:    ... okay on input line 54.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 54.
+LaTeX Font Info:    ... okay on input line 54.
+LaTeX Font Info:    Try loading font information for OT1+lmss on input line 54.
 
  (/usr/local/texlive/2015/texmf-dist/tex/latex/lm/ot1lmss.fd
 File: ot1lmss.fd 2009/10/30 v1.6 Font defs for Latin Modern
@@ -268,17 +276,17 @@ File: ucsencs.def 2011/01/21 Fixes to fontencodings LGR, T3
 )
 (/usr/local/texlive/2015/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count100
+\scratchcounter=\count101
 \scratchdimen=\dimen120
-\scratchbox=\box30
-\nofMPsegments=\count101
-\nofMParguments=\count102
-\everyMPshowfont=\toks25
-\MPscratchCnt=\count103
+\scratchbox=\box32
+\nofMPsegments=\count102
+\nofMParguments=\count103
+\everyMPshowfont=\toks27
+\MPscratchCnt=\count104
 \MPscratchDim=\dimen121
-\MPnumerator=\count104
-\makeMPintoPDFobject=\count105
-\everyMPtoPDFconversion=\toks26
+\MPnumerator=\count105
+\makeMPintoPDFobject=\count106
+\everyMPtoPDFconversion=\toks28
 ) (/usr/local/texlive/2015/texmf-dist/tex/generic/oberdiek/pdftexcmds.sty
 Package: pdftexcmds 2011/11/29 v0.20 Utility functions of pdfTeX for LuaTeX (HO
 )
@@ -328,19 +336,19 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
 ABD: EveryShipout initializing macros
-\c@lstlisting=\count106
-LaTeX Font Info:    Try loading font information for OT1+lmr on input line 54.
+\c@lstlisting=\count107
+LaTeX Font Info:    Try loading font information for OT1+lmr on input line 55.
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 
 LaTeX Font Warning: Font shape `OT1/lmss/m/sc' in size <10.95> not available
-(Font)              Font shape `OT1/lmr/m/sc' tried instead on input line 54.
+(Font)              Font shape `OT1/lmr/m/sc' tried instead on input line 55.
 
 
 LaTeX Font Warning: Font shape `OT1/lmss/m/sc' in size <9> not available
-(Font)              Font shape `OT1/lmr/m/sc' tried instead on input line 54.
+(Font)              Font shape `OT1/lmr/m/sc' tried instead on input line 55.
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/ucs/data/uni-0.def
 File: uni-0.def 2013/05/13 UCS: Unicode data U+0000..U+00FF
@@ -348,7 +356,7 @@ File: uni-0.def 2013/05/13 UCS: Unicode data U+0000..U+00FF
 <contorno_preto.pdf, id=1, 51.392pt x 25.696pt>
 File: contorno_preto.pdf Graphic file (type pdf)
  <use contorno_preto.pdf>
-Package pdftex.def Info: contorno_preto.pdf used on input line 54.
+Package pdftex.def Info: contorno_preto.pdf used on input line 55.
 (pdftex.def)             Requested size: 56.9055pt x 28.45308pt.
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/listings/lstlang1.sty
@@ -362,83 +370,97 @@ File: lstmisc.sty 2014/09/06 1.5e (Carsten Heinz)
 )
 (./tex/Introducao.tex) (./tex/Metodologia.tex)
 (./tex/CondicoesFuncionamento.tex) (./tex/Algoritmos.tex
+LaTeX Font Info:    Try loading font information for OT1+lmtt on input line 7.
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/lm/ot1lmtt.fd
+File: ot1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
+)
+<img/Diagrama_Projeto_ROS.pdf, id=2, 699.82425pt x 448.90958pt>
+File: img/Diagrama_Projeto_ROS.pdf Graphic file (type pdf)
+
+<use img/Diagrama_Projeto_ROS.pdf>
+Package pdftex.def Info: img/Diagrama_Projeto_ROS.pdf used on input line 14.
+(pdftex.def)             Requested size: 376.25838pt x 241.35269pt.
+ [1
+
+{/usr/local/texlive/2015/texmf-var/fonts/map/pdftex/updmap/pdftex.map} <./conto
+rno_preto.pdf>]
 LaTeX Font Info:    Font shape `OT1/lmss/m/it' in size <10.95> not available
-(Font)              Font shape `OT1/lmss/m/sl' tried instead on input line 15.
-LaTeX Font Info:    Try loading font information for OML+lmm on input line 16.
+(Font)              Font shape `OT1/lmss/m/sl' tried instead on input line 33.
+LaTeX Font Info:    Try loading font information for OML+lmm on input line 34.
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 16.
+LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 34.
 
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OMX+lmex on input line 16.
+LaTeX Font Info:    Try loading font information for OMX+lmex on input line 34.
 
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 16.
+(Font)              <10.95> on input line 34.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 16.
+(Font)              <8> on input line 34.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 16.
-LaTeX Font Info:    Try loading font information for U+msa on input line 16.
+(Font)              <6> on input line 34.
+LaTeX Font Info:    Try loading font information for U+msa on input line 34.
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 16.
+LaTeX Font Info:    Try loading font information for U+msb on input line 34.
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 
-LaTeX Warning: Command \textdegree invalid in math mode on input line 16.
+LaTeX Warning: Command \textdegree invalid in math mode on input line 34.
 
 
-LaTeX Warning: Command \textdegree invalid in math mode on input line 16.
+LaTeX Warning: Command \textdegree invalid in math mode on input line 34.
 
-[1
+<img/SensorAngulos.pdf, id=15, 618.31pt x 400.12276pt>
+File: img/SensorAngulos.pdf Graphic file (type pdf)
 
-{/usr/local/texlive/2015/texmf-var/fonts/map/pdftex/updmap/pdftex.map} <./conto
-rno_preto.pdf>]
-LaTeX Font Info:    Try loading font information for OT1+lmtt on input line 21.
-
- (/usr/local/texlive/2015/texmf-dist/tex/latex/lm/ot1lmtt.fd
-File: ot1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
-)
+<use img/SensorAngulos.pdf>
+Package pdftex.def Info: img/SensorAngulos.pdf used on input line 41.
+(pdftex.def)             Requested size: 376.25838pt x 243.4945pt.
+ [2 <./img/Diagrama_Projeto_ROS.pdf>]
 LaTeX Font Info:    Font shape `OT1/lmtt/bx/n' in size <9> not available
-(Font)              Font shape `OT1/lmtt/b/n' tried instead on input line 22.
+(Font)              Font shape `OT1/lmtt/b/n' tried instead on input line 48.
 
 
-LaTeX Warning: Command \textdegree invalid in math mode on input line 39.
+LaTeX Warning: Command \textdegree invalid in math mode on input line 65.
 
 
-LaTeX Warning: Command \textdegree invalid in math mode on input line 39.
+LaTeX Warning: Command \textdegree invalid in math mode on input line 65.
 
-<img/polar_histogram.png, id=13, 712.6625pt x 467.7475pt>
+<img/polar_histogram.png, id=48, 712.6625pt x 467.7475pt>
 File: img/polar_histogram.png Graphic file (type png)
 
 <use img/polar_histogram.png>
-Package pdftex.def Info: img/polar_histogram.png used on input line 46.
+Package pdftex.def Info: img/polar_histogram.png used on input line 72.
 (pdftex.def)             Requested size: 243.4609pt x 159.78859pt.
- [2 <./img/polar_histogram.png>] [3])
-(./tex/Conclusao.tex) (./tex/Referencias.tex [4]) [5] (./RelatorioFCR.aux)
+ [3 <./img/SensorAngulos.pdf>] [4 <./img/polar_histogram.png>] [5]) (./tex/Conc
+lusao.tex) (./tex/Referencias.tex) [6]
+(./RelatorioFCR.aux)
 
 LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 5990 strings out of 493089
- 81668 string characters out of 6134841
- 333774 words of memory out of 5000000
- 9318 multiletter control sequences out of 15000+600000
- 47173 words of font info for 45 fonts, out of 8000000 for 9000
+ 6063 strings out of 493089
+ 82791 string characters out of 6134841
+ 311161 words of memory out of 5000000
+ 9384 multiletter control sequences out of 15000+600000
+ 50199 words of font info for 47 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  41i,6n,58p,805b,1695s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2015/texmf-dist/fonts/enc/dvips/lm/lm-rmtt.enc}{/usr/loca
@@ -453,12 +475,12 @@ live/2015/texmf-dist/fonts/type1/public/lm/lmsso10.pfb></usr/local/texlive/2015
 /texmf-dist/fonts/type1/public/lm/lmsy10.pfb></usr/local/texlive/2015/texmf-dis
 t/fonts/type1/public/lm/lmsy8.pfb></usr/local/texlive/2015/texmf-dist/fonts/typ
 e1/public/lm/lmtk10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/
-lm/lmtt9.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/lm/lmtti10.
-pfb>
-Output written on RelatorioFCR.pdf (5 pages, 286371 bytes).
+lm/lmtt10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/lm/lmtt9.p
+fb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/lm/lmtti10.pfb>
+Output written on RelatorioFCR.pdf (6 pages, 395468 bytes).
 PDF statistics:
- 74 PDF objects out of 1000 (max. 8388607)
- 52 compressed objects within 1 object stream
+ 133 PDF objects out of 1000 (max. 8388607)
+ 97 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 11 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 21 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -1,8 +1,26 @@
 O algoritmo responsável por efetuar o desvio de obstáculos recebe como
 entrada um vetor indicando a direção e a velocidade a serem aplicadas
-ao robô. Ele retorna um novo vetor representando a direção e velocidade
-calculadas de modo que o robô tenda a seguir na direção desejada,
-desviando de eventuais obstáculos.
+ao robô e as leituras do laser. Ele retorna um novo vetor
+representando a direção e velocidade calculadas de modo que o robô
+tenda a seguir na direção desejada, desviando de eventuais obstáculos.
+O vetor de direção é representado por uma mensagem do tipo
+\lcode{geometry\_msgs/Twist}. As leituras do laser são representadas
+por mensagens do tipo \lcode{sensor\_msgs/LaserScan}. Um diagrama
+contendo os nós e tópicos utilizados pelo sistema podem pode ser
+observado na Figura \ref{fig:diag_proj_ros}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{img/Diagrama_Projeto_ROS.pdf}
+    \caption{Diagrama de nós do sistema}
+    \label{fig:diag_proj_ros}
+\end{figure}
+
+O tópico \lcode{hokuyo\_scan} fornece as leituras do laser, e o tópico
+\lcode{cmd\_vel\_mux/input/} fornece os vetores indicando a direção que
+o robô deve seguir. O módulo \textbf{Obstacle Avoidance} representa o
+algoritmo de desvio de obstáculos, o qual posta os vetores resultantes
+no tópico \lcode{cmd\_vel} do robô.
 
 \subsection{Detecção de Obstáculos}
 
@@ -14,8 +32,16 @@ de distância menor que o limite, é chamado o algoritmo VFH. Como o
 laser utilizado fornece aproximadamente 728 amostras de distâncias
 (\textit{ranges}), 40 vezes por segundo, decidiu-se verificar a cada
 dez amostras a presença de obstáculos, de $-90°$ a $+90°$ em relação
-ao eixo central do robô. O algoritmo de detecção de obstáculos
-implementado pode ser observado no Código \ref{cod:checkObstacles}.
+ao eixo central do robô (Figura \ref{fig:laser_scan}). O algoritmo de
+detecção de obstáculos implementado pode ser observado no Código
+\ref{cod:checkObstacles}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{img/SensorAngulos.pdf}
+    \caption{Leitura do sensor laser}
+    \label{fig:laser_scan}
+\end{figure}
 
 \begin{lstlisting}[frame=single, label=cod:checkObstacles, style=customc,
 caption={Algoritmo de Verificação de Obstáculos}]
@@ -41,7 +67,7 @@ robô. Em seguida verifica os possíveis vales para onde o robô poderá
 seguir, retornando o conjunto de ângulos que representam as direções
 centrais de cada vale (Código \ref{cod:vales}).
 
-\begin{figure}[!h]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.55\textwidth]{img/polar_histogram}
     \caption{Histograma polar de magnitudes, com um valor empírico de
@@ -117,9 +143,9 @@ desviando.
 
 \subsection{Leituras do Laser}
 
-Para as amostras do sensor utilizado, foi utilizado um filtro baseado
-na média temporal dos valores fornecidos, visando a eliminação de
-eventuais ruídos na leitura (Código \ref{cod:laser_callback}).
+Para as amostras do sensor, foi utilizado um filtro baseado na média
+temporal dos valores fornecidos, visando a eliminação de eventuais
+ruídos na leitura (Código \ref{cod:laser_callback}).
 
 \begin{lstlisting}[frame=single, label=cod:laser_callback, style=customc, caption={Filtro de amostras do laser}]
 void laserCallback(sensor_msgs::LaserScan scan)
