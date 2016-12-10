@@ -1,30 +1,13 @@
-Para o correto funcionamento da nossa implementação, assume-se que o Pioneer 
-será equipado com um sensor Hokuyo com aproximadamente 728 amostras de distância 
-de objetos, 40 vezes por segundo, para que se possa detectar a presença de 
-objetos próximos. Além de, possuir rodas de borracha de modo que o Pioneer não 
-deslize ao se movimentar e tração o suficiente para permitir que o robô rode 
-sobre o eixo desejado.
+Para o correto funcionamento da atual implementação, assume-se que o Pioneer 
+será equipado com um sensor laser.
 
-As condições do ambiente devem ser um chão plano para que o Pioneer possa se 
-deslocar e para que o sensor de laser possa captar melhor os obstáculos, 
-assumindo que os obstáculos estarão visíveis através do sensor, e que o chão 
-seja não escorregadio para que o robô seja capaz de seguir fielmente a direção 
-e velocidade dadas ao controlar o Pioneer.
+As condições do ambiente devem ser um terreno plano e com espaço suficiente para que o Pioneer possa se 
+deslocar. Além disso, o terreno não deve ser escorregadio, para evitar colisões inesperadas. 
+ 
+Os obstáculos não podem se movimentar com uma velocidade elevada quando próximos ao robô, pois, caso contrário, o robô poderá não ter tempo suficiente para calcular a nova rota, causando uma colisão com o obstáculo. 
+Por fim, os obstáculos devem possuir textura e coloração refletora e altura mínima, de forma que o laser consiga detectá-los.
 
-Em relação aos obstáculos, as condições são que não pode haver um número 
-demasiadamente grande de obstáculos porque, com o algoritmo implementado, o 
-Pioneer não seria capaz de achar um caminho viável para desvio, pois assumiu-se 
-uma distância mínima entre o robô e os obstáculos. 
-
-Além disso, os obstáculos não podem se movimentar com uma velocidade muito 
-grande perto do robô, pois, caso essa situação ocorresse, o robô poderia não ter
-tempo o suficiente para calcular a nova rota e desviar a tempo do obstáculo 
-podendo causar uma colisão. E, por fim, os obstáculos devem estar em uma altura
-e ter o formato que possa ser detectado pelo sensor de laser e não podem ser 
-capazes de absorver o raio laser.
-
-O algoritmo utilizado VFH planeja o caminho apenas localmente e dessa forma, 
-não tenta achar um caminho otimizado para o robô, implicando que, o robô pode 
-ficar “preso” em situações sem fim, ou seja, ele pode andar em círculos ou 
-circular entre os obstáculos para tentar o desvio e pode não voltar para o 
-caminho original.
+O algoritmo VFH planeja o caminho apenas localmente e, dessa forma, 
+não tenta achar um caminho otimizado para o robô, implicando que este pode 
+ficar “preso” indefinidamente em algumas situações. Neste caso, ele geralmente andará em círculos ou 
+circulará em torno de um conjunto de obstáculos próximos.

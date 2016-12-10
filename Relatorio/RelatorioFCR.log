@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.11.22)  10 DEC 2016 16:49
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.11.22)  10 DEC 2016 19:48
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -502,32 +502,35 @@ File: img/bubble.png Graphic file (type png)
 Package pdftex.def Info: img/bubble.png used on input line 99.
 (pdftex.def)             Requested size: 265.59494pt x 145.0032pt.
 )
-(./tex/CondicoesFuncionamento.tex) (./tex/Algoritmos.tex
+(./tex/CondicoesFuncionamento.tex [5 <./img/candidate_directions.png> <./img/bu
+bble.png>] (/usr/local/texlive/2015/texmf-dist/tex/latex/ucs/data/uni-32.def
+File: uni-32.def 2013/05/13 UCS: Unicode data U+2000..U+20FF
+))
+(./tex/Algoritmos.tex
 LaTeX Font Info:    Try loading font information for OT1+lmtt on input line 7.
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/lm/ot1lmtt.fd
 File: ot1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
-) [5 <./img/candidate_directions.png> <./img/bubble.png>]
+)
 <img/Diagrama_Projeto_ROS.pdf, id=47, 699.82425pt x 448.90958pt>
 File: img/Diagrama_Projeto_ROS.pdf Graphic file (type pdf)
 
 <use img/Diagrama_Projeto_ROS.pdf>
 Package pdftex.def Info: img/Diagrama_Projeto_ROS.pdf used on input line 14.
 (pdftex.def)             Requested size: 376.25838pt x 241.35269pt.
+ [6 <./img/Diagrama_Projeto_ROS.pdf>]
+
+LaTeX Warning: Command \textdegree invalid in math mode on input line 31.
 
 
 LaTeX Warning: Command \textdegree invalid in math mode on input line 31.
 
-
-LaTeX Warning: Command \textdegree invalid in math mode on input line 31.
-
-<img/SensorAngulos.pdf, id=48, 618.31pt x 400.12276pt>
+<img/SensorAngulos.pdf, id=77, 618.31pt x 400.12276pt>
 File: img/SensorAngulos.pdf Graphic file (type pdf)
 
 <use img/SensorAngulos.pdf>
 Package pdftex.def Info: img/SensorAngulos.pdf used on input line 38.
 (pdftex.def)             Requested size: 376.25838pt x 243.4945pt.
- [6 <./img/Diagrama_Projeto_ROS.pdf>]
 LaTeX Font Info:    Font shape `OT1/lmtt/bx/n' in size <9> not available
 (Font)              Font shape `OT1/lmtt/b/n' tried instead on input line 45.
 
@@ -537,11 +540,8 @@ LaTeX Warning: Command \textdegree invalid in math mode on input line 61.
 
 LaTeX Warning: Command \textdegree invalid in math mode on input line 61.
 
-[7 <./img/SensorAngulos.pdf>] [8]) (./tex/Conclusao.tex) (./tex/Referencias.tex
-(/usr/local/texlive/2015/texmf-dist/tex/latex/ucs/data/uni-32.def
-File: uni-32.def 2013/05/13 UCS: Unicode data U+2000..U+20FF
-) [9])
-[10] (./RelatorioFCR.aux)
+[7 <./img/SensorAngulos.pdf>] [8] [9]) (./tex/Conclusao.tex)
+(./tex/Referencias.tex) [10] (./RelatorioFCR.aux)
 
 LaTeX Warning: There were multiply-defined labels.
 
@@ -549,7 +549,7 @@ LaTeX Warning: There were multiply-defined labels.
 Here is how much of TeX's memory you used:
  7437 strings out of 493089
  106141 string characters out of 6134841
- 359060 words of memory out of 5000000
+ 324060 words of memory out of 5000000
  10742 multiletter control sequences out of 15000+600000
  50199 words of font info for 47 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -574,7 +574,7 @@ f-dist/fonts/type1/public/lm/lmsy8.pfb></usr/local/texlive/2015/texmf-dist/font
 s/type1/public/lm/lmtk10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/pu
 blic/lm/lmtt10.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/lm/lm
 tt9.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/public/lm/lmtti10.pfb>
-Output written on RelatorioFCR.pdf (10 pages, 1244248 bytes).
+Output written on RelatorioFCR.pdf (10 pages, 1246948 bytes).
 PDF statistics:
  180 PDF objects out of 1000 (max. 8388607)
  124 compressed objects within 2 object streams
