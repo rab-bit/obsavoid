@@ -1,14 +1,14 @@
-Os robôs estão cada vez mais autônomos, e quando se trata de
+Os robôs estão cada vez mais autônomos e, quando se trata da
 exploração de um ambiente, uma importante tarefa que ele deve estar
 apto a realizar é a prevenção de obstáculos em seu caminho. Essa
 tarefa é dinâmica, ou seja, não é necessário ter um conhecimento
 prévio do ambiente em que o robô se encontra, contando apenas com
 algoritmos que trabalham com dados recebidos pelos
 sensores. Tipicamente, o desvio de obstáculos recebe instruções de
-outro módulo (geralmente o planejador de rota) que indica qual direção
-ele deve seguir, e assim, decide o movimento que o motor deve realizar
-baseado nos dados que os sensores fornecem, realizando, portanto, uma
+outro módulo (geralmente o planejador de trajetória) que indica qual direção
+ele deve seguir e, assim, decide o movimento que o motor deve realizar
+baseado nos dados que os sensores fornecem, criando-se, portanto, uma
 interface entre o módulo de decisão de caminho e o motor do robô.
-Atualmente, existem diversos algoritmos que propõem a resolução do
-desvio de obstáculos. O utilizado neste projeto foi o Vector Field
-Histogram(VFH).
+Atualmente, existem diversos métodos que propõem a resolução do
+desvio de obstáculos. Os utilizados neste projeto foram o Vector Field
+Histogram (VFH) \cite{c1} e a técnica de Bubble Band \cite{c3}.

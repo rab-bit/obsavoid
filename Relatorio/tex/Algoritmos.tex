@@ -12,11 +12,11 @@ observado na Figura \ref{fig:diag_proj_ros}.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\textwidth]{img/Diagrama_Projeto_ROS.pdf}
-    \caption{Diagrama de nós do sistema}
+    \caption{Diagrama de nós do sistema.}
     \label{fig:diag_proj_ros}
 \end{figure}
 
-O tópico \lcode{hokuyo\_scan} fornece as leituras do laser, e o tópico
+O tópico \lcode{hokuyo\_scan} fornece as leituras do laser e o tópico
 \lcode{cmd\_vel\_mux/input/} fornece os vetores indicando a direção que
 o robô deve seguir. O módulo \textbf{Obstacle Avoidance} representa o
 algoritmo de desvio de obstáculos, o qual posta os vetores resultantes
@@ -26,9 +26,9 @@ no tópico \lcode{cmd\_vel} do robô.
 
 Foi utilizado um algoritmo implementando a técnica de Bubble Band  (Seção \ref{sec:bubbleband}). Caso alguma amostra do sensor aponte um valor
 de distância menor que o limite da "bolha", é chamado o algoritmo VFH (Seção \ref{sec:vfh}). Como o
-laser utilizado fornece aproximadamente 728 amostras de distâncias
-(\textit{ranges}) 40 vezes por segundo, decidiu-se verificar a cada
-dez amostras a presença de obstáculos, de $-90°$ a $+90°$ em relação
+laser utilizado fornece, 40 vezes por segundo, aproximadamente 728 amostras de distâncias
+(\textit{ranges}), decidiu-se verificar, a cada
+dez amostras, a presença de obstáculos em uma extensão de $-90°$ a $+90°$ em relação
 ao eixo central do robô (Figura \ref{fig:laser_scan}). O algoritmo de
 detecção de obstáculos implementado pode ser observado no Código
 \ref{cod:checkObstacles}.
@@ -36,7 +36,7 @@ detecção de obstáculos implementado pode ser observado no Código
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\textwidth]{img/SensorAngulos.pdf}
-    \caption{Leitura do sensor laser}
+    \caption{Leitura do sensor laser.}
     \label{fig:laser_scan}
 \end{figure}
 
@@ -58,8 +58,8 @@ bool checkForObstacles(sensor_msgs::LaserScan msg, float limite){
 
 \subsection{VFH}
 
-Primeiramente, o VFH monta um histograma polar de magnitudes, de $-90°$ a $+90°$ em relação ao eixo central do
-robô. Em seguida verifica os possíveis vales para onde o robô poderá
+Primeiramente, o VFH monta um histograma polar de magnitudes de $-90°$ a $+90°$ em relação ao eixo central do
+robô. Em seguida, verifica os possíveis vales para onde o robô poderá
 seguir, retornando o conjunto de ângulos que representam as direções
 centrais de cada vale (Código \ref{cod:vales}).
 
@@ -95,7 +95,7 @@ int VFH::getVales(float* vales, sensor_msgs::LaserScan msg){
 Se nenhum vale for encontrado, o robô para e gira em torno do próprio
 eixo. Caso sejam encontrados um ou mais vales, é escolhido o vale cuja
 direção seja a mais próxima da direção em que o robô é ordenado a
-seguir. Durante este processo a velocidade do robô é limitada, de modo
+seguir. Durante este processo, a velocidade do robô é limitada, de modo
 que ele não venha a colidir com o obstáculo do qual ele está
 desviando.
 
