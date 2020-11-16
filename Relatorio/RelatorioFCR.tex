@@ -1,0 +1,83 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{helvet} 
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{a4wide}
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+%\usepackage[english]{babel}
+\usepackage[portuges]{babel}
+\usepackage{graphicx}
+\usepackage{cite}
+\usepackage[absolute]{textpos}
+\usepackage{fancyhdr}
+\usepackage{amsfonts}
+\usepackage[table]{xcolor}
+\usepackage{UnBTitle}
+\usepackage{etoolbox}
+\usepackage{listings}
+\usepackage{float}% Para o uso da opção [H] de flutuação das imagens
+\usepackage{caption}
+\usepackage{subcaption}
+
+\renewcommand{\lstlistingname}{Código}
+
+% Configuracao de lstlistings
+\lstdefinestyle{customc}{
+  belowcaptionskip=1\baselineskip,
+  breaklines=true,
+  frame=L,
+  xleftmargin=\parindent,
+  language=C,
+  showstringspaces=false,
+  basicstyle=\footnotesize\ttfamily,
+  keywordstyle=\bfseries\color{green!40!black},
+  commentstyle=\itshape\color{purple!40!black},
+  identifierstyle=\color{blue},
+  stringstyle=\color{orange},
+}
+
+\departamento{
+Fundamentos Computacionais de Robótica \\
+Departamento de Ciência da Computação - CIC - UnB \\
+Prof. Carla Cavalcante Koike
+}
+
+\title{
+Trabalho 2 \\ Abordagem para Desvio de Obstáculos utilizando Robô Pioneer 3AT
+}
+
+\author{
+Andressa Sousa da Silveira - 10/0053971 \\
+Lucília Pereira de Oliveira - 12/0045397 \\
+Matheus Medeiros Sarmento - 12/0053161 \\
+Rondinele Barbosa Prado - 10/0039880 \\
+%
+}
+\begin{document}
+\maketitle
+\lstset{language=C++} 
+
+
+\thispagestyle{empty}
+\pagestyle{empty}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Introdução}
+\input{tex/Introducao.tex}
+
+\section{Metodologia}
+\input{tex/Metodologia.tex}
+
+\section{Condições de Funcionamento}
+\input{tex/CondicoesFuncionamento.tex}
+
+\section{Algoritmos Implementados}
+\input{tex/Algoritmos.tex}
+
+\section{Conclusão}
+\input{tex/Conclusao.tex}
+
+\section{Referências}
+\input{tex/Referencias.tex}
+
+\end{document}                   

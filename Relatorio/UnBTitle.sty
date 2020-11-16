@@ -1,0 +1,53 @@
+% Copyright note: Este pacote define um cabecalho padrao para
+% documentos da UnB
+% Autor: Rondinele Barbosa Prado
+
+\ProvidesPackage{UnBTitle}[2016/05/10 v.01 Pacote exemplo]
+\RequirePackage{graphicx}
+\RequirePackage[utf8x]{inputenc}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+
+\newcommand*{\departamento}[1]{\gdef\@departamento{#1}%
+}
+\newcommand*{\@departamento}{Departamento de Ciência da Computação}
+
+
+\renewcommand*{\maketitle}{%
+
+\begin{center}
+{
+\noindent\begin{minipage}[b]{0.49\hsize}
+\raggedright
+\scshape\footnotesize\@departamento\unskip\strut
+\end{minipage}
+\hfill
+\begin{minipage}[b]{.49\hsize}
+\raggedleft
+\scshape\footnotesize Universidade de Brasília - UnB 
+\includegraphics[width=2cm]{contorno_preto.pdf}
+\end{minipage}
+\HRule
+} 
+
+\centering
+\vspace{20pt}
+{\LARGE\bf\@title\unskip\strut\par}
+\vspace{20pt}
+{\large\@author\unskip\strut\par}
+\end{center}
+\vspace{20pt}
+
+
+}
+
+%-----------------------------------------------------
+% Novo comando para uso de verbatim em palavras junto ao texto
+% \lcode{<codigo>}
+%-----------------------------------------------------
+\RequirePackage{lmodern}
+
+\newcommand{\lcode}[1]{\textsf{\ttfamily #1}}%
+
+
+\endinput

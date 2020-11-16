@@ -1,0 +1,13 @@
+Para o correto funcionamento da atual implementação, assume-se que o Pioneer 
+será equipado com um sensor laser.
+
+As condições do ambiente devem ser um terreno plano e com espaço suficiente para que o Pioneer possa se 
+deslocar. Além disso, o terreno não deve ser escorregadio, para evitar colisões inesperadas. 
+ 
+Os obstáculos não podem se movimentar com uma velocidade elevada quando próximos ao robô, pois, caso contrário, o robô poderá não ter tempo suficiente para calcular a nova rota, causando uma colisão com o obstáculo. 
+Por fim, os obstáculos devem possuir textura e coloração refletora e altura mínima, de forma que o laser consiga detectá-los.
+
+O algoritmo VFH planeja o caminho apenas localmente e, dessa forma, 
+não tenta achar um caminho otimizado para o robô, implicando que este pode 
+ficar “preso” indefinidamente em algumas situações. Neste caso, ele geralmente andará em círculos ou 
+circulará em torno de um conjunto de obstáculos próximos.
